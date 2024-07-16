@@ -1,17 +1,22 @@
 #include "hosts_file.h"
 #include <fstream>
 #include <spdlog/spdlog.h>
+#include <iostream>
+#include <sstream>
 
 namespace d2hs
 {
-    HostsFile::HostsFile() : delimiter_pos(), file_content()
+    HostsFile::HostsFile(str file_path) : delimiter_pos(), file_content()
     {
-        std::ifstream hosts_file(HOSTS_FILE_PATH);
+        hosts_file_path = file_path;
+        std::ifstream hosts_file(hosts_file_path);
 
         if (!hosts_file.is_open())
         {
-            spdlog::error("Failed to open hosts file: {}", HOSTS_FILE_PATH);
+            spdlog::error("Failed to open hosts file: {}", hosts_file_path);
             throw std::runtime_error("Failed to open hosts file.");
+        } else {
+            spdlog::info("Opened hosts file: {}", hosts_file_path);
         }
 
         str line;
@@ -22,7 +27,7 @@ namespace d2hs
         hosts_file.close();
 
         // fist, find the first two delimiter positions.
-        for (int i = 0; i < file_content.size(); i++)
+        for (std::size_t i = 0; i < file_content.size(); i++)
         {
             if (file_content[i] == HOSTS_DELIMITER)
             {
@@ -45,11 +50,11 @@ namespace d2hs
             // no delimiter found. This file is untouched by d2hs.
             spdlog::info("No delimiter found. This is a new file for d2hs.");
 
-            // add the delimiter to the content.
-            file_content.push_back(HOSTS_DELIMITER);
-            file_content.push_back(HOSTS_DELIMITER);
+            // add the delimiter to the last of the content.
             delimiter_pos.push_back(file_content.size());
             delimiter_pos.push_back(file_content.size() + 1);
+            file_content.push_back(HOSTS_DELIMITER);
+            file_content.push_back(HOSTS_DELIMITER);
         }
         else
         {
@@ -66,24 +71,32 @@ namespace d2hs
         return extracted_content;
     }
 
-    void HostsFile::write_d2hs_lines(const std::vector<str> &new_content)
+    str HostsFile::write_d2hs_lines(const std::vector<str> &new_content, bool dry_run)
     {
         // replace the content between the delimiters.
         file_content.erase(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
         file_content.insert(file_content.begin() + delimiter_pos[0] + 1, new_content.begin(), new_content.end());
         delimiter_pos[1] = delimiter_pos[0] + new_content.size() + 1;
 
-        std::ofstream hosts_file(HOSTS_FILE_PATH);
-        if (!hosts_file.is_open())
-        {
-            spdlog::error("Failed to open hosts file: {}", HOSTS_FILE_PATH);
-            return;
-        }
-
+        std::stringstream output_buffer;
         for (const auto &line : file_content)
         {
-            hosts_file << line << '\n';
+            output_buffer << line << '\n';
         }
-        spdlog::info("Hosts file write completed.");
+        if (!dry_run)
+        {
+            // update hosts file
+            std::ofstream hosts_file(hosts_file_path);
+            if (!hosts_file.is_open())
+            {
+                spdlog::error("Failed to open hosts file: {}", hosts_file_path);
+                spdlog::error("reason {}", strerror(errno));
+                exit(2);
+                return {};
+            }
+            hosts_file << output_buffer.str();
+            spdlog::info("Hosts file write completed.");
+        }
+        return output_buffer.str();
     }
 }

@@ -1,5 +1,7 @@
 #include "record.h"
 #include <stdexcept>
+#include <format>
+#include <spdlog/spdlog.h>
 
 namespace d2hs
 {
@@ -16,7 +18,13 @@ namespace d2hs
         }
         else
         {
+            spdlog::warn("Invalid record type {}.", record_type_str);
             throw std::invalid_argument("Invalid record type.");
         }
+    }
+
+    str RRRecord::to_hosts_line() const
+    {
+        return std::format("{} {}", value, name);
     }
 }

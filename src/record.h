@@ -18,7 +18,7 @@ namespace d2hs
         RecordType type;
 
         str to_hosts_line() const;
-        bool operator==(RRRecord const& another_record);
+        // bool operator==(RRRecord const& another_record);
     };
 
     RecordType str_to_record_type(const str &record_type_str);

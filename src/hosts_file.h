@@ -5,7 +5,7 @@
 
 using str = std::string;
 
-constexpr auto HOSTS_FILE_PATH = "/etc/hosts";
+// TODO: don't hardcode this.
 constexpr auto HOSTS_DELIMITER = "#d2hs_delimiter";
 
 namespace d2hs
@@ -13,9 +13,10 @@ namespace d2hs
     class HostsFile
     {
     public:
-        HostsFile();
+        str hosts_file_path;
+        HostsFile(str file_path);
         std::vector<str> read_d2hs_lines();
-        void write_d2hs_lines(const std::vector<str> &new_content);
+        str write_d2hs_lines(const std::vector<str> &new_content, bool dry_run);
 
     private:
         std::vector<int> delimiter_pos;
