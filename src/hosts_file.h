@@ -10,8 +10,15 @@ constexpr auto HOSTS_DELIMITER = "#d2hs_delimiter";
 
 namespace d2hs
 {
-    str record_to_host_line(const Record &record);
-    std::vector<str> read_d2hs_hosts_content();
-    void write_d2hs_hosts_content(const std::vector<str> &content);
-    void compare_hosts_content(const std::vector<str> &content1, const std::vector<str> &content2);
+    class HostsFile
+    {
+    public:
+        HostsFile();
+        std::vector<str> read_d2hs_lines();
+        void write_d2hs_lines(const std::vector<str> &new_content);
+
+    private:
+        std::vector<int> delimiter_pos;
+        std::vector<str> file_content;
+    };
 }

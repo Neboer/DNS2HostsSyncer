@@ -9,5 +9,5 @@ using str = std::string;
 
 namespace d2hs
 {
-    std::vector<Record> parse_dns_response(const json &response);
+    std::vector<RRRecord> parse_pdns_response(const json &response);
 }

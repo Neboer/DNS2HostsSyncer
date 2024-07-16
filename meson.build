@@ -3,4 +3,6 @@ nlohmann_json = dependency('nlohmann_json')
 spdlog = dependency('spdlog')
 argparse = dependency('argparse')
 restclient = dependency('restclient-cpp')
-executable('d2hs', 'src/main.cpp', dependencies: [nlohmann_json, spdlog, argparse, restclient])
+executable('d2hs', 
+    ['src/main.cpp', 'src/parse_args.cpp'], 
+dependencies: [nlohmann_json, spdlog, argparse, restclient])

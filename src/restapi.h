@@ -2,8 +2,11 @@
 #include "rrpool_conf.h"
 #include "record.h"
 #include "vector"
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 namespace d2hs
 {
-    std::vector<Record> get_records_from_rr_pool(const rrpool_config &cfg);
+    json get_json_from_pdns_server(const rrpool_config &cfg);
 }
