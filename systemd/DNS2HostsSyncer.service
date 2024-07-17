@@ -1,0 +1,9 @@
+[Unit]
+Description=DNS2HostsSyncer
+
+[Service]
+Type=oneshot
+ExecStart=intentionally leave blank
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer to trigger hosts refresh
+
+[Timer]
+OnBootSec=20min
+OnUnitActiveSec=20min
+Unit=DNS2HostsSyncer.service
+
+[Install]
+WantedBy=timers.target
