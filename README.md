@@ -4,8 +4,39 @@ Small tools for syncing DNS Records with hosts file.
 ## Overview
 The DNS to Hosts File Syncer (d2hs) is a tool designed to synchronize DNS records from a PowerDNS upstream server to your hosts file. It leverages the PowerDNS Admin API to fetch DNS records for a specific zone and updates the hosts file accordingly. Additionally, the tool monitors changes in the hosts file to ensure records remain in sync with the upstream server.
 
-## Installation
-we use meson build system to build the program. It requires 4 deps: nlohmann_json, spdlog, argparse and restclient.
+## Build and Installation
+we use meson build system to build the program. It requires 4 deps:
+- [nlohmann_json](https://github.com/nlohmann/json)
+- [spdlog](https://github.com/gabime/spdlog)
+- [argparse](https://github.com/p-ranav/argparse)
+- [restclient](https://github.com/mrtazz/restclient-cpp)
+
+To build and install the project on Linux, you need to install these dependencies first.
+
+Build instructions on Arch Linux:
+(need AUR Helper yay installed)
+```bash
+yay -S nlohmann-json spdlog-git argparse
+# install restclient
+git clone https://github.com/mrtazz/restclient-cpp.git
+cd restclient-cpp
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+cmake --install build
+# Currently, the AUR package restclient uses autotools build and does not provide enough package information for build systems like pkgconfig, CMake or meson. So we build it with CMake to solve this problem.
+```
+After that, install out package.
+```bash
+git clone https://github.com/Neboer/DNS2HostsSyncer
+cd DNS2HostsSyncer
+meson setup build
+meson compile -C build
+meson install -C build
+```
+Then you have the software `d2hs` installed.
+```bash
+d2hs --help
+```
 
 ## Usage
 The basic usage pattern for d2hs is as follows:

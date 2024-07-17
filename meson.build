@@ -14,4 +14,5 @@ executable(
         'src/hosts_file.cpp'
     ],
     dependencies: [nlohmann_json, spdlog, argparse, restclient],
+    install: true
 )
