@@ -16,14 +16,22 @@ namespace d2hs
         conn->AppendHeader("X-API-KEY", rrpool_cfg.api_key);
 
         RestClient::Response r = conn->get(std::format("/api/v1/servers/{}/zones/{}", rrpool_cfg.server_name, rrpool_cfg.zone_name));
-        if (r.code == 200)
+        if (conn->GetInfo().lastRequest.curlCode == CURLE_OK)
         {
-            return json::parse(r.body);
+            if (r.code == 200)
+            {
+                return json::parse(r.body);
+            }
+            else
+            {
+                spdlog::error("Failed to get normal response from PowerDNS API. Status code: {}, Body: {}", r.code, r.body);
+                throw std::runtime_error("HTTP error");
+            }
         }
         else
         {
-            spdlog::error("Failed to get response from PowerDNS API. Status code: {}, Body: {}", r.code, r.body);
-            throw std::runtime_error("Failed to get response from PowerDNS API.");
+            spdlog::error("A network error occurred: {}", curl_easy_strerror((CURLcode)conn->GetInfo().lastRequest.curlCode));
+            throw std::runtime_error("network error");
         }
     }
 }

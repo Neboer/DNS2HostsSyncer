@@ -1,0 +1,11 @@
+{
+    "hosts_file_path": "/etc/hosts",
+    "rrpools": [
+        {
+            "api_endpoint_url": "http://api.example.com:8081",
+            "api_key": "secret_api_key",
+            "server_name": "localhost",
+            "zone_name": "test.server."
+        }
+    ]
+}

@@ -3,26 +3,10 @@
 
 namespace d2hs
 {
-
-    program_config parse_args(int argc, char **argv)
+    program_arguments parse_args(int argc, char **argv)
     {
-        argparse::ArgumentParser parser("d2hs", "0.1");
-        parser.add_argument("-u", "--api-endpoint-url")
-            .required()
-            .metavar("API_ENDPOINT_URL")
-            .help("API endpoint URL");
-        parser.add_argument("-k", "--api-key")
-            .required()
-            .metavar("API_KEY")
-            .help("API key");
-        parser.add_argument("-s", "--server-name")
-            .required()
-            .metavar("SERVER_NAME")
-            .help("Server name");
-        parser.add_argument("-z", "--zone-name")
-            .required()
-            .metavar("ZONE_NAME")
-            .help("Zone name");
+        argparse::ArgumentParser parser("d2hs", "2.0");
+
         parser.add_argument("-d", "--dry-run")
             .flag()
             .help("dry run");
@@ -30,6 +14,10 @@ namespace d2hs
             .default_value("/etc/hosts")
             .metavar("HOSTS_FILE_PATH")
             .help("Hosts file path");
+        parser.add_argument("-c", "--config-file-location")
+            .default_value("/etc/d2hs/d2hs.json")
+            .metavar("CONFIG_FILE_LOCATION")
+            .help("Configuration file location");
 
         try
         {
@@ -42,15 +30,10 @@ namespace d2hs
             exit(1);
         }
 
-        return program_config{
-            {
-                parser.get<str>("--api-endpoint-url"),
-                parser.get<str>("--api-key"),
-                parser.get<str>("--server-name"),
-                parser.get<str>("--zone-name")
-            },
+        return {
+            parser.get<std::string>("--config-file-location"),
             parser.get<bool>("--dry-run"),
-            parser.get<str>("--hosts-file-path")
+            parser.get<std::string>("--hosts-file-path")
         };
     }
 }

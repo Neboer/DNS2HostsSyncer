@@ -7,12 +7,12 @@ using str = std::string;
 
 namespace d2hs
 {
-    struct program_config
+    struct program_arguments
     {
-        rrpool_config rrpool_cfg;
+        str config_file_location;
         bool dry_run;
         str hosts_file_path;
     };
 
-    program_config parse_args(int argc, char **argv);
+    program_arguments parse_args(int argc, char **argv);
 }

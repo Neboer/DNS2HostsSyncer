@@ -13,7 +13,7 @@ namespace d2hs
 
         if (!hosts_file.is_open())
         {
-            spdlog::error("Failed to open hosts file: {}", hosts_file_path);
+            spdlog::critical("Failed to open hosts file: {}", hosts_file_path);
             throw std::runtime_error("Failed to open hosts file.");
         } else {
             spdlog::info("Opened hosts file: {}", hosts_file_path);
@@ -42,7 +42,7 @@ namespace d2hs
         if (delimiter_pos.size() == 1)
         {
             // only one delimiter found. This is an Malformed hosts file.
-            spdlog::error("Malformed hosts file. Missing second delimiter.");
+            spdlog::critical("Malformed hosts file. Missing second delimiter.");
             throw std::runtime_error("Malformed hosts file. Missing second delimiter.");
         }
         else if (delimiter_pos.size() == 0)
@@ -89,10 +89,8 @@ namespace d2hs
             std::ofstream hosts_file(hosts_file_path);
             if (!hosts_file.is_open())
             {
-                spdlog::error("Failed to open hosts file: {}", hosts_file_path);
-                spdlog::error("reason {}", strerror(errno));
-                exit(2);
-                return {};
+                spdlog::critical("Failed to write hosts file: {}, {}", hosts_file_path, strerror(errno));
+                throw std::runtime_error("failed to write hosts file");
             }
             hosts_file << output_buffer.str();
             spdlog::info("Hosts file write completed.");

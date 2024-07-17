@@ -4,6 +4,7 @@
 #include "rrpool_conf.h"
 #include "record.h"
 #include "hosts_file.h"
+#include "parse_config.h"
 #include <algorithm>
 #include <spdlog/spdlog.h>
 #include <restclient-cpp/restclient.h>
@@ -13,7 +14,14 @@ std::vector<str> rrrecords_to_hosts_lines(const std::vector<d2hs::RRRecord> &rec
     std::vector<str> lines = {};
     for (const auto &record : records)
     {
-        lines.push_back(record.to_hosts_line());
+        try
+        {
+            lines.push_back(record.to_hosts_line());
+        }
+        catch (const std::invalid_argument &e)
+        {
+            spdlog::warn("error when converting record {}/{} to hosts line: {}", record.name, record.value, e.what());
+        }
     }
     return lines;
 }
@@ -33,43 +41,74 @@ bool compare_two_unsorted_vectors(const std::vector<str> &v1, const std::vector<
 
 int main(int argc, char **argv)
 {
-    d2hs::program_config program_cfg = d2hs::parse_args(argc, argv);
-    // initialize the rest client.
-    RestClient::init();
-    // find host record in hosts file. Hosts file path is passed by the user or /etc/hosts as default.
-    d2hs::HostsFile hosts_file = d2hs::HostsFile(program_cfg.hosts_file_path);
-
-    spdlog::info("sending API request...");
-    // api sending from rrpoolcfg passed from command line.
-    json record_response = d2hs::get_json_from_pdns_server(program_cfg.rrpool_cfg);
-    spdlog::info("API request successful.");
-    std::vector<d2hs::RRRecord> server_records = d2hs::parse_pdns_response(record_response);
-    std::vector<str> server_records_hosts_lines = rrrecords_to_hosts_lines(server_records);
-    std::vector<str> d2hs_hosts_lines = hosts_file.read_d2hs_lines();
-
-    // for each record, check if it exists in the hosts file's d2fs section.
-    auto is_records_changed = !compare_two_unsorted_vectors(server_records_hosts_lines, d2hs_hosts_lines);
-
-    if (is_records_changed)
+    try
     {
-        spdlog::info("Detected changes in DNS result. Updating hosts file...");
-        // there are difference between the server's response and the hosts file content.
-        // update the hosts file.
-        std::vector<str> new_d2hs_hosts_records = {};
-        for (const auto &record : server_records)
+        d2hs::program_arguments program_args = d2hs::parse_args(argc, argv);
+        d2hs::program_config program_cfg = d2hs::parse_config_file(program_args.config_file_location);
+        // initialize the rest client.
+        RestClient::init();
+        // find host record in hosts file. Hosts file path is passed by the user or /etc/hosts as default.
+        d2hs::HostsFile hosts_file = d2hs::HostsFile(program_args.hosts_file_path);
+
+        std::vector<str> all_server_records_hosts_lines = {};
+        bool error_on_api = false;
+
+        // gather api results.
+        for (const auto &rrpool_cfg : program_cfg.rrpool_cfgs)
         {
-            new_d2hs_hosts_records.push_back(record.to_hosts_line());
+            spdlog::info("sending API request to endpoint: {}, server_name: {}, zone_name: {}", rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name);
+            try
+            {
+                json record_response = d2hs::get_json_from_pdns_server(rrpool_cfg);
+                spdlog::info("API request completed.");
+                std::vector<d2hs::RRRecord> server_records = d2hs::parse_pdns_response(record_response);
+                std::vector<str> server_records_hosts_lines = rrrecords_to_hosts_lines(server_records);
+                all_server_records_hosts_lines.insert(all_server_records_hosts_lines.end(), server_records_hosts_lines.begin(), server_records_hosts_lines.end());
+            }
+            catch (const std::runtime_error &e)
+            {
+                error_on_api = true;
+                spdlog::error("Failed to process PowerDNS API from endpoint: {}, server_name: {}, zone_name: {}. Error: {}. Skipping this API request.",
+                              rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name, e.what());
+                continue;
+            }
         }
-        str new_resolve_content = hosts_file.write_d2hs_lines(new_d2hs_hosts_records, program_cfg.dry_run);
-        if (program_cfg.dry_run)
+
+        if (all_server_records_hosts_lines.empty())
         {
-            std::cout << new_resolve_content;
+            // no records found. There is nothing to do, exit.
+            spdlog::warn("No records found. Exiting.");
+            return error_on_api ? 1 : 0;
+        }
+        else
+        {
+            std::vector<str> d2hs_hosts_lines = hosts_file.read_d2hs_lines();
+
+            // for each record, check if it exists in the hosts file's d2fs section.
+            auto is_records_changed = !compare_two_unsorted_vectors(all_server_records_hosts_lines, d2hs_hosts_lines);
+
+            if (is_records_changed)
+            {
+                spdlog::info("Detected changes in DNS result. Updating hosts file...");
+                // there are difference between the server's response and the hosts file content.
+                // update the hosts file.
+                str new_resolve_content = hosts_file.write_d2hs_lines(all_server_records_hosts_lines, program_args.dry_run);
+                if (program_args.dry_run)
+                {
+                    std::cout << new_resolve_content;
+                }
+            }
+            else
+            {
+                spdlog::info("No changes detected in DNS result.");
+            }
+
+            return 0;
         }
     }
-    else
+    catch (const std::exception &e)
     {
-        spdlog::info("No changes detected in DNS result.");
+        spdlog::critical("An error occurred: {}", e.what());
+        return 1;
     }
-
-    return 0;
 }
