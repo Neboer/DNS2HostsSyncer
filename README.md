@@ -38,20 +38,67 @@ Then you have the software `d2hs` installed.
 d2hs --help
 ```
 
+## Configuration
+The default configuration file is located at /etc/d2hs/d2hs.json.
+
+The configuration file for `d2hs` is a JSON file that specifies the settings and parameters for synchronizing DNS records with the hosts file.
+
+### `hosts_file_path`
+- **Type:** String
+- **Description:** Specifies the path to the hosts file that will be updated by `d2hs`.
+- **Example:** `"/etc/hosts"`
+
+### `rrpools`
+- **Type:** Array of objects
+- **Description:** Contains a list of resource record pools. Each pool defines a set of parameters to connect to a PowerDNS API and fetch DNS records.
+- **Example:**
+  ```json
+  "rrpools": [
+      {
+          "api_endpoint_url": "http://api.example.com:8081",
+          "api_key": "secret_api_key",
+          "server_name": "localhost",
+          "zone_name": "test.server."
+      }
+  ]
+  ```
+
+#### Inside `rrpools`
+Each object inside the `rrpools` array should have the following fields:
+
+- **`api_endpoint_url`**
+  - **Type:** String
+  - **Description:** The URL of the PowerDNS API endpoint.
+  - **Example:** `"http://api.example.com:8081"`
+
+- **`api_key`**
+  - **Type:** String
+  - **Description:** The API key used for authenticating with the PowerDNS API.
+  - **Example:** `"secret_api_key"`
+
+- **`server_name`**
+  - **Type:** String
+  - **Description:** The name of the PowerDNS server.
+  - **Example:** `"localhost"`
+
+- **`zone_name`**
+  - **Type:** String
+  - **Description:** The name of the DNS zone to synchronize.
+  - **Example:** `"test.server."`
+
+
 ## Usage
 The basic usage pattern for d2hs is as follows:
 
 ```bash
-./builddir/d2hs --api-endpoint-url API_ENDPOINT_URL --api-key API_KEY --server-name SERVER_NAME --zone-name ZONE_NAME [options]
-Command-Line Arguments
--h, --help: Shows the help message and exits.
--v, --version: Prints the version information and exits.
--u, --api-endpoint-url API_ENDPOINT_URL: Specifies the API endpoint URL (required).
--k, --api-key API_KEY: Specifies the API key for authenticating with the API endpoint (required).
--s, --server-name SERVER_NAME: Specifies the server name where the PowerDNS instance is running (required).
--z, --zone-name ZONE_NAME: Specifies the zone name to synchronize (required).
--d, --dry-run: Executes a dry run, which shows what changes would be made without actually modifying the hosts file.
--f, --hosts-file-path HOSTS_FILE_PATH: Specifies the path to the hosts file. If not provided, the default is "/etc/hosts".
+Usage: d2hs [--help] [--version] [--dry-run] [--hosts-file-path HOSTS_FILE_PATH] [--config-file-location CONFIG_FILE_LOCATION]
+
+Optional arguments:
+  -h, --help                  shows help message and exits 
+  -v, --version               prints version information and exits 
+  -d, --dry-run               dry run 
+  -f, --hosts-file-path       Hosts file path [default: "/etc/hosts"]
+  -c, --config-file-location  Configuration file location [default: "/etc/d2hs/d2hs.json"]
 ```
 
 Here is an example of how to use d2hs:
@@ -59,7 +106,7 @@ Here is an example of how to use d2hs:
 Synchronize DNS records from the PowerDNS upstream server:
 
 ```bash
-d2hs -u http://test.dns.site:1234 -k test_key -s localhost -z test.domain. -f /home/test/temp/hosts
+d2hs -c /etc/d2fs.json
 ```
 
 ## Features

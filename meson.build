@@ -11,7 +11,9 @@ executable(
         'src/protocol.cpp',
         'src/record.cpp',
         'src/restapi.cpp',
-        'src/hosts_file.cpp'
+        'src/hosts_file.cpp',
+        'src/parse_config.cpp',
+        'src/rrpool_conf.cpp'
     ],
     dependencies: [nlohmann_json, spdlog, argparse, restclient],
     install: true
