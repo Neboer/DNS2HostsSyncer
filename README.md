@@ -84,7 +84,7 @@ The program manage hosts file in a way like this:
 10.0.0.2 other.records
 
 ```
-D2fs will only focus on the lines between two delimiters `#d2hs_delimiter`. It will check if the returned records are the same as the lines between delimiters. If not, or if the d2hs_delimiter does not exist, d2hs will update its content or create delimiters in this file. The sequence of the lines has nothing to do with this check -- they are sorted before comparation.
+D2fs will only focus on the lines between two delimiters `#d2hs_delimiter`. It will check if the returned records are the same as the lines between delimiters. If not, or if the d2hs_delimiter does not exist, d2hs will update its content or create delimiters in this file. The sequence of the lines has nothing to do with this check -- they are sorted before comparison.
 
 ## Notes
 - Ensure that the API key provided has the necessary permissions to access the required zones on the PowerDNS server.
