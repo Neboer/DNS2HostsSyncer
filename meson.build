@@ -13,8 +13,13 @@ executable(
         'src/restapi.cpp',
         'src/hosts_file.cpp',
         'src/parse_config.cpp',
-        'src/rrpool_conf.cpp'
+        'src/rrpool_conf.cpp',
     ],
     dependencies: [nlohmann_json, spdlog, argparse, restclient],
-    install: true
+    install: true,
+)
+install_data(
+    sources: 'config/example_d2hs.json',
+    rename: 'd2hs.json',
+    install_dir: '/etc/d2hs',
 )

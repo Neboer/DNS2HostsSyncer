@@ -51,6 +51,7 @@ int main(int argc, char **argv)
         d2hs::HostsFile hosts_file = d2hs::HostsFile(program_args.hosts_file_path);
 
         std::vector<str> all_server_records_hosts_lines = {};
+        bool error_on_api = false;
 
         // gather api results.
         for (const auto &rrpool_cfg : program_cfg.rrpool_cfgs)
@@ -66,34 +67,44 @@ int main(int argc, char **argv)
             }
             catch (const std::runtime_error &e)
             {
+                error_on_api = true;
                 spdlog::error("Failed to process PowerDNS API from endpoint: {}, server_name: {}, zone_name: {}. Error: {}. Skipping this API request.",
                               rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name, e.what());
                 continue;
             }
         }
 
-        std::vector<str> d2hs_hosts_lines = hosts_file.read_d2hs_lines();
-
-        // for each record, check if it exists in the hosts file's d2fs section.
-        auto is_records_changed = !compare_two_unsorted_vectors(all_server_records_hosts_lines, d2hs_hosts_lines);
-
-        if (is_records_changed)
+        if (all_server_records_hosts_lines.empty())
         {
-            spdlog::info("Detected changes in DNS result. Updating hosts file...");
-            // there are difference between the server's response and the hosts file content.
-            // update the hosts file.
-            str new_resolve_content = hosts_file.write_d2hs_lines(all_server_records_hosts_lines, program_args.dry_run);
-            if (program_args.dry_run)
-            {
-                std::cout << new_resolve_content;
-            }
+            // no records found. There is nothing to do, exit.
+            spdlog::warn("No records found. Exiting.");
+            return error_on_api ? 1 : 0;
         }
         else
         {
-            spdlog::info("No changes detected in DNS result.");
-        }
+            std::vector<str> d2hs_hosts_lines = hosts_file.read_d2hs_lines();
 
-        return 0;
+            // for each record, check if it exists in the hosts file's d2fs section.
+            auto is_records_changed = !compare_two_unsorted_vectors(all_server_records_hosts_lines, d2hs_hosts_lines);
+
+            if (is_records_changed)
+            {
+                spdlog::info("Detected changes in DNS result. Updating hosts file...");
+                // there are difference between the server's response and the hosts file content.
+                // update the hosts file.
+                str new_resolve_content = hosts_file.write_d2hs_lines(all_server_records_hosts_lines, program_args.dry_run);
+                if (program_args.dry_run)
+                {
+                    std::cout << new_resolve_content;
+                }
+            }
+            else
+            {
+                spdlog::info("No changes detected in DNS result.");
+            }
+
+            return 0;
+        }
     }
     catch (const std::exception &e)
     {
