@@ -48,7 +48,9 @@ int main(int argc, char **argv)
         // initialize the rest client.
         RestClient::init();
         // find host record in hosts file. Hosts file path is passed by the user or /etc/hosts as default.
-        d2hs::HostsFile hosts_file = d2hs::HostsFile(program_args.hosts_file_path);
+
+        d2hs::HostsFile hosts_file = program_args.is_hosts_file_set ? d2hs::HostsFile(program_args.hosts_file_path)
+                                                                    : d2hs::HostsFile(program_cfg.hosts_file_path);
 
         std::vector<str> all_server_records_hosts_lines = {};
         bool error_on_api = false;

@@ -11,7 +11,9 @@ namespace d2hs
     {
         str config_file_location;
         bool dry_run;
+
         str hosts_file_path;
+        bool is_hosts_file_set;
     };
 
     program_arguments parse_args(int argc, char **argv);
