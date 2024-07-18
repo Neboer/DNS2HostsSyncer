@@ -1,4 +1,4 @@
-project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '2.1')
+project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '2.2')
 nlohmann_json = dependency('nlohmann_json')
 spdlog = dependency('spdlog')
 argparse = dependency('argparse')
