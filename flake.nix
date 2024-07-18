@@ -19,18 +19,16 @@
       commonDeps = (p: with p; [ nlohmann_json spdlog argparse curl ]);
     in {
       packages = forAllSystems (system:
-        let
-          pkgs = nixpkgsFor.${system};
-        in
-        rec {
-	  restclient-cpp = pkgs.stdenv.mkDerivation {
+        let pkgs = nixpkgsFor.${system};
+        in rec {
+          restclient-cpp = pkgs.stdenv.mkDerivation {
             pname = "restclient-cpp";
-	        version = "git";
+            version = "git";
             src = restclient-cpp-src;
-            nativeBuildInputs = with pkgs; [  gnumake cmake pkg-config ];
+            nativeBuildInputs = with pkgs; [ gnumake cmake pkg-config ];
             buildInputs = with pkgs; [ curl ];
             configurePhase = ''
-              mkdir $out
+              #mkdir $out
               cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$out
             '';
             buildPhase = ''
@@ -43,30 +41,39 @@
 
           default = pkgs.stdenv.mkDerivation {
             pname = "d2hs";
-	        version = "1.0";
+            version = "1.0";
             src = ./.;
             nativeBuildInputs = (with pkgs; [ meson ninja cmake pkg-config ]);
             buildInputs = (commonDeps pkgs) ++ [ restclient-cpp ];
             enableParallelBuilding = true;
+            preConfigure = ''
+              #mkdir $out
+            '';
+            configurePhase = ''
+              meson setup build
+            '';
+            buildPhase = ''
+              meson compile -C build
+            '';
+            installPhase = ''
+              DESTDIR=$out meson install -C build
+              mv $out/usr/local/bin $out/bin
+              rm -r $out/usr
+            '';
           };
         });
 
       devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgsFor.${system};
-        in
-        {
+        let pkgs = nixpkgsFor.${system};
+        in {
           default = pkgs.mkShell {
-            buildInputs = ( with pkgs; [
-              meson
-              ninja
-              pkg-config
-              clang
-	      clang-tools
-	      strace
-            ]) ++ (commonDeps pkgs);
+            buildInputs =
+              (with pkgs; [ meson ninja pkg-config stdenv.cc.cc clang-tools strace tree ])
+              ++ (commonDeps pkgs);
           };
         });
+
+      formatter = forAllSystems (system: nixpkgsFor.${system}.nixfmt);
     };
 }
 

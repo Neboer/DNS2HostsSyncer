@@ -1,4 +1,4 @@
-project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '0.1.0')
+project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '2.1')
 nlohmann_json = dependency('nlohmann_json')
 spdlog = dependency('spdlog')
 argparse = dependency('argparse')
@@ -23,3 +23,6 @@ install_data(
     rename: 'd2hs.json',
     install_dir: '/etc/d2hs',
 )
+
+install_data(['systemd/DNS2HostsSyncer.service', 'systemd/DNS2HostsSyncer.timer'],
+             install_dir : '/usr/lib/systemd/system')

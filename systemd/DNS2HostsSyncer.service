@@ -1,0 +1,10 @@
+[Unit]
+Description=synchronize DNS records from a PowerDNS upstream server to your hosts file
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/d2hs 
+
+[Install]
+WantedBy=multi-user.target
