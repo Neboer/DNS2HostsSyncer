@@ -1,7 +1,7 @@
 #include "record.h"
 #include <stdexcept>
-#include <format>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/fmt.h>
 
 namespace d2hs
 {
@@ -25,6 +25,6 @@ namespace d2hs
 
     str RRRecord::to_hosts_line() const
     {
-        return std::format("{} {}", value, name);
+        return fmt::format("{} {}", value, name);
     }
 }

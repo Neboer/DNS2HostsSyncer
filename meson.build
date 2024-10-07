@@ -2,7 +2,7 @@ project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '2.2')
 nlohmann_json = dependency('nlohmann_json')
 spdlog = dependency('spdlog')
 argparse = dependency('argparse')
-restclient = dependency('restclient-cpp')
+curl = dependency('curl')
 executable(
     'd2hs',
     [
@@ -15,7 +15,7 @@ executable(
         'src/parse_config.cpp',
         'src/rrpool_conf.cpp',
     ],
-    dependencies: [nlohmann_json, spdlog, argparse, restclient],
+    dependencies: [nlohmann_json, spdlog, argparse, curl],
     install: true,
 )
 install_data(

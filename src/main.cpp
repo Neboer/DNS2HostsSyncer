@@ -7,7 +7,7 @@
 #include "parse_config.h"
 #include <algorithm>
 #include <spdlog/spdlog.h>
-#include <restclient-cpp/restclient.h>
+#include <curl/curl.h>
 
 std::vector<str> rrrecords_to_hosts_lines(const std::vector<d2hs::RRRecord> &records)
 {
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         d2hs::program_arguments program_args = d2hs::parse_args(argc, argv);
         d2hs::program_config program_cfg = d2hs::parse_config_file(program_args.config_file_location);
         // initialize the rest client.
-        RestClient::init();
+        curl_global_init(CURL_GLOBAL_DEFAULT);
         // find host record in hosts file. Hosts file path is passed by the user or /etc/hosts as default.
 
         d2hs::HostsFile hosts_file = program_args.is_hosts_file_set ? d2hs::HostsFile(program_args.hosts_file_path)

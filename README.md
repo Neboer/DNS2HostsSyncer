@@ -5,27 +5,33 @@ Small tools for syncing DNS Records with hosts file.
 The DNS to Hosts File Syncer (d2hs) is a tool designed to synchronize DNS records from a PowerDNS upstream server to your hosts file. It leverages the PowerDNS Admin API to fetch DNS records for a specific zone and updates the hosts file accordingly. Additionally, the tool monitors changes in the hosts file to ensure records remain in sync with the upstream server.
 
 ## Build and Installation
-we use meson build system to build the program. It requires 4 deps:
+we use meson/cmake build system to build the program. It requires 4 deps:
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [spdlog](https://github.com/gabime/spdlog)
 - [argparse](https://github.com/p-ranav/argparse)
-- [restclient](https://github.com/mrtazz/restclient-cpp)
+- libcurl
 
-To build and install the project on Linux, you need to install these dependencies first.
+If you use cmake install, the project will download and build deps automatically, except for libcurl.
+
+You need to install all deps first only if you want to use cmake to build d2hs without downloading any package, just use your local package.
+
+You always need to install all deps first if you use meson build. 
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+make install
+```
 
 Build instructions on Arch Linux:
 (need AUR Helper yay installed)
 ```bash
-yay -S nlohmann-json spdlog-git argparse
-# install restclient
-git clone https://github.com/mrtazz/restclient-cpp.git
-cd restclient-cpp
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build build
-cmake --install build
-# Currently, the AUR package restclient uses autotools build and does not provide enough package information for build systems like pkgconfig, CMake or meson. So we build it with CMake to solve this problem.
+yay -S nlohmann-json spdlog-git argparse curl
 ```
-After that, install out package.
+After that, build and install the program.
+
 ```bash
 git clone https://github.com/Neboer/DNS2HostsSyncer
 cd DNS2HostsSyncer

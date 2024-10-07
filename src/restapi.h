@@ -1,8 +1,6 @@
 #pragma once
 #include "rrpool_conf.h"
 #include "record.h"
-#include "vector"
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
