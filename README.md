@@ -44,6 +44,12 @@ Then you have the software `d2hs` installed.
 d2hs --help
 ```
 
+If you are using nix or nixos with flakes enables, just run
+```
+nix build
+```
+to build. The built artifact lies in ./result/bin/d2hs.
+
 ## Configuration
 The default configuration file is located at /etc/d2hs/d2hs.json.
 
