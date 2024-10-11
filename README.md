@@ -44,7 +44,7 @@ Then you have the software `d2hs` installed.
 d2hs --help
 ```
 
-If you are using nix or nixos with flakes enables, just run
+If you are using nix or nixos with flakes enabled, just run
 ```
 nix build
 ```
