@@ -18,7 +18,7 @@ set(SOURCES
 find_package(nlohmann_json QUIET)
 find_package(spdlog QUIET)
 find_package(argparse QUIET)
-find_package(curl REQUIRED)
+find_package(CURL REQUIRED)
 
 if(NOT (nlohmann_json_FOUND AND spdlog_FOUND AND argparse_FOUND))
     message(STATUS "Some packages not found, fetching required dependencies using FetchContent...")
@@ -53,7 +53,7 @@ target_link_libraries(d2hs
     nlohmann_json::nlohmann_json
     spdlog::spdlog
     argparse::argparse
-    curl
+    CURL::libcurl
 )
 
 # Installation rules

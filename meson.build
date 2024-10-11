@@ -2,7 +2,7 @@ project('d2hs', 'cpp', default_options: ['cpp_std=c++20'], version: '2.2')
 nlohmann_json = dependency('nlohmann_json')
 spdlog = dependency('spdlog')
 argparse = dependency('argparse')
-curl = dependency('curl')
+curl = dependency('libcurl')
 executable(
     'd2hs',
     [
