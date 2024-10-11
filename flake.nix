@@ -1,10 +1,6 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-  inputs.restclient-cpp-src = {
-    url = "github:mrtazz/restclient-cpp";
-    flake = false;
-  };
-  outputs = { self, nixpkgs, restclient-cpp-src }:
+  outputs = { self, nixpkgs }:
     let
       supportedSystems = [
         "aarch64-linux"
@@ -20,31 +16,13 @@
     in {
       packages = forAllSystems (system:
         let pkgs = nixpkgsFor.${system};
-        in rec {
-          restclient-cpp = pkgs.stdenv.mkDerivation {
-            pname = "restclient-cpp";
-            version = "git";
-            src = restclient-cpp-src;
-            nativeBuildInputs = with pkgs; [ gnumake cmake pkg-config ];
-            buildInputs = with pkgs; [ curl ];
-            configurePhase = ''
-              #mkdir $out
-              cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$out
-            '';
-            buildPhase = ''
-              cmake --build build
-            '';
-            installPhase = ''
-              cmake --install build
-            '';
-          };
-
+        in {
           default = pkgs.stdenv.mkDerivation {
             pname = "d2hs";
             version = "1.0";
             src = ./.;
             nativeBuildInputs = (with pkgs; [ meson ninja cmake pkg-config ]);
-            buildInputs = (commonDeps pkgs) ++ [ restclient-cpp ];
+            buildInputs = (commonDeps pkgs) ++ [ ];
             enableParallelBuilding = true;
             preConfigure = ''
               #mkdir $out

@@ -16,26 +16,9 @@
         "type": "github"
       }
     },
-    "restclient-cpp-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1704819068,
-        "narHash": "sha256-Kkssda9pCT64+25w9dkWZXHfscdoW+zqWGH+/uo1iIs=",
-        "owner": "mrtazz",
-        "repo": "restclient-cpp",
-        "rev": "fdf722bbab55d0838200dfbf2c3a2815741c8a7e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mrtazz",
-        "repo": "restclient-cpp",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs",
-        "restclient-cpp-src": "restclient-cpp-src"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
