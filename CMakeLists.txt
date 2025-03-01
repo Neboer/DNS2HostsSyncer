@@ -43,19 +43,25 @@ target_link_libraries(d2hs
     CURL::libcurl
 )
 
+# 设置默认安装前缀为相对路径（仅在用户未指定时生效）
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND UNIX)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Installation directory" FORCE)
+endif()
+
 if (UNIX)
-    # Installation rules
+    # Installation rules for executable
     install(TARGETS d2hs
         RUNTIME DESTINATION bin
     )
 
-    install(DIRECTORY include/ DESTINATION include)
-
-    # Install configuration file and rename it to d2hs.json
-    install(FILES config/example_d2hs.json
-        DESTINATION /etc/d2hs
-    RENAME d2hs.json
-    )
+    # 检查系统配置文件是否存在
+    if(NOT EXISTS "/etc/d2hs/d2hs.json")
+        # Install configuration file with conditional check
+        install(FILES config/example_d2hs.json
+            DESTINATION /etc/d2hs
+            RENAME d2hs.json
+        )
+    endif()
 
     # Install systemd service and timer files
     install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
