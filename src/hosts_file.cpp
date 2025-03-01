@@ -15,7 +15,9 @@ namespace d2hs
         {
             spdlog::critical("Failed to open hosts file: {}", hosts_file_path);
             throw std::runtime_error("Failed to open hosts file.");
-        } else {
+        }
+        else
+        {
             spdlog::info("Opened hosts file: {}", hosts_file_path);
         }
 
@@ -76,7 +78,7 @@ namespace d2hs
         // replace the content between the delimiters.
         file_content.erase(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
         file_content.insert(file_content.begin() + delimiter_pos[0] + 1, new_content.begin(), new_content.end());
-        delimiter_pos[1] = delimiter_pos[0] + new_content.size() + 1;
+        delimiter_pos[1] = static_cast<int>(delimiter_pos[0] + new_content.size() + 1);
 
         std::stringstream output_buffer;
         for (const auto &line : file_content)

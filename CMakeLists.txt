@@ -1,9 +1,19 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(d2hs LANGUAGES CXX VERSION 2.3)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/package_install" CACHE PATH "" FORCE)
+    mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
+    
+    # 设置扁平化目录结构
+    set(CMAKE_INSTALL_BINDIR ".")
+    set(CMAKE_INSTALL_LIBDIR ".")
+endif()
+
+# Source files for the project
 set(SOURCES
     src/main.cpp
     src/parse_args.cpp
@@ -15,39 +25,16 @@ set(SOURCES
     src/rrpool_conf.cpp
 )
 
-find_package(nlohmann_json QUIET)
-find_package(spdlog QUIET)
-find_package(argparse QUIET)
+# Find required packages
+find_package(nlohmann_json REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(argparse REQUIRED)
 find_package(CURL REQUIRED)
 
-if(NOT (nlohmann_json_FOUND AND spdlog_FOUND AND argparse_FOUND))
-    message(STATUS "Some packages not found, fetching required dependencies using FetchContent...")
-
-    include(FetchContent)
-    FetchContent_Declare(
-        nlohmann_json
-        GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG v3.11.3 # Specify the version you want
-    )
-
-    FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.14.1 # Specify the version you want
-    )
-
-    FetchContent_Declare(
-        argparse
-        GIT_REPOSITORY https://github.com/p-ranav/argparse.git
-        GIT_TAG v3.1 # Specify the version you want
-    )
-
-    FetchContent_MakeAvailable(nlohmann_json spdlog argparse)
-
-endif()
-
+# Create the executable target
 add_executable(d2hs ${SOURCES})
 
+# Link the libraries to the executable
 target_link_libraries(d2hs
     PRIVATE
     nlohmann_json::nlohmann_json
@@ -56,20 +43,50 @@ target_link_libraries(d2hs
     CURL::libcurl
 )
 
-# Installation rules
-install(TARGETS d2hs
-    RUNTIME DESTINATION bin
-)
+if (UNIX)
+    # Installation rules
+    install(TARGETS d2hs
+        RUNTIME DESTINATION bin
+    )
 
-install(DIRECTORY include/ DESTINATION include)
+    install(DIRECTORY include/ DESTINATION include)
 
-# Install configuration file and rename it to d2hs.json
-install(FILES config/example_d2hs.json
-    DESTINATION /etc/d2hs
+    # Install configuration file and rename it to d2hs.json
+    install(FILES config/example_d2hs.json
+        DESTINATION /etc/d2hs
     RENAME d2hs.json
-)
+    )
 
-# Install systemd service and timer files
-install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
-    DESTINATION /usr/lib/systemd/system
-)
+    # Install systemd service and timer files
+    install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
+        DESTINATION /usr/lib/systemd/system
+    )
+endif (UNIX)
+
+message(STATUS "BINARY_DIR: ${CMAKE_BINARY_DIR}")
+
+# Windows install rules
+if(WIN32)
+
+    install(TARGETS d2hs
+        RUNTIME DESTINATION . COMPONENT Runtime
+        LIBRARY DESTINATION . COMPONENT Runtime
+    )
+
+    install(FILES 
+        $<TARGET_RUNTIME_DLLS:d2hs>
+        TYPE BIN
+        COMPONENT Runtime
+    )
+
+    install(CODE [[
+        message("\n\n")
+        file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" NATIVE_INSTALL_DIR)
+        message("=== installer files have been prepared ===")
+        message("location: ${NATIVE_INSTALL_DIR}")
+        message("create NSIS installer using command bellow:")
+        message("makensis -DINSTDIR=${NATIVE_INSTALL_DIR} package/installer.nsi")
+        message("=============================\n")
+    ]])
+
+endif(WIN32)

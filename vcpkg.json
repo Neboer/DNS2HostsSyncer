@@ -1,0 +1,10 @@
+{
+  "name": "d2hs",
+  "version": "2.3",
+  "dependencies": [
+    "curl",
+    "nlohmann-json",
+    "spdlog",
+    "argparse"
+  ]
+}
