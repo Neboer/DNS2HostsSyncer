@@ -54,6 +54,8 @@ Section "Main Application" SecMain
   
   ; Copy all files from CMake's package_install directory
   File /r "..\build\package_install\*.*"
+
+  File "reshedule_task.ps1"  ; add reshedule_task.ps1 to the installer
   
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -72,6 +74,17 @@ Section "Main Application" SecMain
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DNS2HostsSyncer" \
                    "NoRepair" 1
 
+  ; create shedule task
+  DetailPrint "now creating shedule task..."
+  nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& { \
+    $env:PSModulePath = [System.Environment]::GetEnvironmentVariable(\"PSModulePath\", \"Machine\"); \
+    & \"$INSTDIR\reshedule_task.ps1\" -BinaryPath \"$INSTDIR\d2hs.exe\" \
+  }"'
+  Pop $0  ; get the return value
+  ${If} $0 != 0
+    MessageBox MB_ICONSTOP|MB_OK "task create failed with error code $0"
+    Abort
+  ${EndIf}
 SectionEnd
 
 ; -------------------------------

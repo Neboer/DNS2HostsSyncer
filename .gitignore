@@ -35,3 +35,5 @@ builddir/
 .vscode/
 build/
 result
+
+windows_build.ps1
