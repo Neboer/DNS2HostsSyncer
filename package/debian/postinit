@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# 处理配置文件更新
+CONFIG_FILE="/etc/d2hs/d2hs.json"
+if [ ! -f "$CONFIG_FILE" ]; then
+    cp /etc/d2hs/d2hs.json.example $CONFIG_FILE
+fi
+
+# 重载systemd
+systemctl daemon-reload
+
+# 启用并启动服务
+systemctl enable DNS2HostsSyncer.timer
+systemctl start DNS2HostsSyncer.timer

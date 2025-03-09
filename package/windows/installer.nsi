@@ -4,8 +4,8 @@
 Unicode true
 SetCompressor /SOLID lzma
 Name "DNS2HostsSyncer"
-!system 'mkdir "../build"'
-OutFile "../build/DNS2HostsSyncer_Installer.exe"
+!system 'mkdir "../../build"'
+OutFile "../../build/DNS2HostsSyncer_Installer.exe"
 Caption "DNS2HostsSyncer Installation"
 VIProductVersion "2.3.0.0"
 VIAddVersionKey "ProductName" "DNS2HostsSyncer"
@@ -27,7 +27,7 @@ VIAddVersionKey "FileDescription" "DNS2HostsSyncer Installer"
 ; Page Sequence
 ; -------------------------------
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "../LICENSE"
+!insertmacro MUI_PAGE_LICENSE "../../LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -53,9 +53,29 @@ Section "Main Application" SecMain
   SetOutPath $INSTDIR
   
   ; Copy all files from CMake's package_install directory
-  File /r "..\build\package_install\*.*"
-
+  File /r "..\..\build\package_install\*.*"
   File "reshedule_task.ps1"  ; add reshedule_task.ps1 to the installer
+  File "..\..\config\example_d2hs.json" 
+
+  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "AppData"
+  DetailPrint "Detected user AppData: $0"
+  ; Create AppData directory
+  CreateDirectory "$0\neboer\DNS2HostsSyncer"
+  DetailPrint "Creating directory: $0\neboer\DNS2HostsSyncer (if it already exists, no error will be thrown)"
+
+  SetOutPath "$0\neboer\DNS2HostsSyncer"
+  DetailPrint "Current output directory set to: $OUTDIR"
+
+  DetailPrint "Checking if file exists: [$OUTDIR\d2hs.json]"
+  IfFileExists "d2hs.json" skip_config_copy 0
+      DetailPrint "File does not exist, starting to copy the configuration file..."
+      File /oname=d2hs.json "..\..\config\example_d2hs.json"
+      DetailPrint "Created new configuration file: $OUTDIR\d2hs.json"
+      Goto after_copy
+  skip_config_copy:
+      DetailPrint "File already exists, skipping copy"
+  after_copy:
+
   
   ; Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"

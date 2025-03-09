@@ -1,5 +1,7 @@
 #include "parse_args.h"
 #include <spdlog/spdlog.h>
+#include "hosts_file.h"
+#include "parse_config.h"
 
 namespace d2hs
 {
@@ -11,13 +13,13 @@ namespace d2hs
             .flag()
             .help("dry run");
         parser.add_argument("-f", "--hosts-file-path")
+            .default_value(HostsFile::get_hosts_file_path())
             .metavar("HOSTS_FILE_PATH")
             .help("Hosts file path, default is same as the config.");
         parser.add_argument("-c", "--config-file-location")
-            .default_value("/etc/d2hs/d2hs.json")
+            .default_value(get_default_config_file_location())
             .metavar("CONFIG_FILE_LOCATION")
             .help("Configuration file location");
-
         try
         {
             parser.parse_args(argc, argv);
@@ -29,20 +31,21 @@ namespace d2hs
             exit(1);
         }
 
-        if (parser.present("--hosts-file-path")) {
+        if (parser.present("--hosts-file-path"))
+        {
             return {
                 parser.get<std::string>("--config-file-location"),
                 parser.get<bool>("--dry-run"),
                 parser.get<std::string>("--hosts-file-path"),
-                true
-            };
-        } else {
+                true};
+        }
+        else
+        {
             return {
                 parser.get<std::string>("--config-file-location"),
                 parser.get<bool>("--dry-run"),
                 "",
-                false
-            };
+                false};
         }
     }
 }

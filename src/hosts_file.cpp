@@ -99,4 +99,15 @@ namespace d2hs
         }
         return output_buffer.str();
     }
+
+    str HostsFile::get_hosts_file_path()
+    {
+#ifdef _WIN32
+        return "C:\\Windows\\System32\\drivers\\etc\\hosts";
+#elif defined(__APPLE__)
+        return "/private/etc/hosts";
+#else
+        return "/etc/hosts";
+#endif
+    }
 }

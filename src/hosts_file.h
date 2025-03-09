@@ -17,6 +17,7 @@ namespace d2hs
         HostsFile(str file_path);
         std::vector<str> read_d2hs_lines();
         str write_d2hs_lines(const std::vector<str> &new_content, bool dry_run);
+        static str get_hosts_file_path();
 
     private:
         std::vector<int> delimiter_pos;

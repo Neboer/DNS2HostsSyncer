@@ -8,7 +8,7 @@ param(
 $buildDir = "build"
 $installerName = "DNS2HostsSyncer_Installer.exe"
 $packageDir = "build/package_install"
-$nsisScript = "package/installer.nsi"
+$nsisScript = "package/windows/installer.nsi"
 
 # Clean up and create build directory
 if (-not (Test-Path $buildDir)) {

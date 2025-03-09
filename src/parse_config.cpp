@@ -30,11 +30,31 @@ namespace d2hs
 
             return {
                 rrpool_cfgs,
-                config_json["hosts_file_path"]
-                };
-        } else {
+                config_json["hosts_file_path"]};
+        }
+        else
+        {
             spdlog::critical("Malformed config file. Missing rrpools or hosts_file_path or type is wrong.");
             throw std::runtime_error("config parse error");
         }
+    }
+
+    str get_default_config_file_location()
+    {
+#if defined(_WIN32)
+        // Windows default config file location using %APPDATA%
+        if (const char* appdata = std::getenv("APPDATA"))
+        {
+            return std::string(appdata) + "\\neboer\\DNS2HostsSyncer\\d2hs.json";
+        }
+        else
+        {
+            spdlog::critical("APPDATA environment variable is not defined.");
+            throw std::runtime_error("APPDATA environment variable is not defined.");
+        }
+#else
+        // Fallback default location for other OSes
+        return "/etc/d2hs/d2hs.json";
+#endif
     }
 }

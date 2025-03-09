@@ -54,19 +54,31 @@ if (UNIX)
         RUNTIME DESTINATION bin
     )
 
-    # 检查系统配置文件是否存在
-    if(NOT EXISTS "/etc/d2hs/d2hs.json")
-        # Install configuration file with conditional check
-        install(FILES config/example_d2hs.json
-            DESTINATION /etc/d2hs
-            RENAME d2hs.json
-        )
-    endif()
-
+    # 安装配置文件（总是覆盖打包版本）
+    install(FILES config/example_d2hs.json
+        DESTINATION /etc/d2hs
+        RENAME d2hs.json
+    )
     # Install systemd service and timer files
     install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
         DESTINATION /usr/lib/systemd/system
     )
+    # 添加CPack配置
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_DEBIAN_PACKAGE_NAME "d2hs")
+    set(CPACK_DEBIAN_FILE_NAME "d2hs_${PROJECT_VERSION}_${CMAKE_GENERATOR_PLATFORM}.deb")
+    set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Neboer <rubinposter@gmail.com>")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "DNS to Hosts Synchronization Service")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcurl4, libc6, libstdc++6, libgcc-s1")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/Neboer/DNS2HostsSyncer")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA 
+        "${CMAKE_CURRENT_SOURCE_DIR}/package/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/package/debian/prerm")
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+
 endif (UNIX)
 
 message(STATUS "BINARY_DIR: ${CMAKE_BINARY_DIR}")
@@ -96,3 +108,4 @@ if(WIN32)
     ]])
 
 endif(WIN32)
+include(CPack)

@@ -14,4 +14,5 @@ namespace d2hs
     };
 
     program_config parse_config_file(const str &config_file_location);
+    str get_default_config_file_location();
 }
