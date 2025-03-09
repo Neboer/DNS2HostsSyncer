@@ -2,10 +2,7 @@
 set -e
 
 # 处理配置文件更新
-CONFIG_FILE="/etc/d2hs/d2hs.json"
-if [ ! -f "$CONFIG_FILE" ]; then
-    cp /etc/d2hs/d2hs.json.example $CONFIG_FILE
-fi
+echo "config file location: /etc/d2hs/d2hs.json"
 
 # 重载systemd
 systemctl daemon-reload

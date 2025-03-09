@@ -63,10 +63,12 @@ if (UNIX)
     install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
         DESTINATION /usr/lib/systemd/system
     )
+    # 检测目标架构
+    EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
     # 添加CPack配置
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_NAME "d2hs")
-    set(CPACK_DEBIAN_FILE_NAME "d2hs_${PROJECT_VERSION}_${CMAKE_GENERATOR_PLATFORM}.deb")
+    set(CPACK_DEBIAN_FILE_NAME "d2hs_${PROJECT_VERSION}_${ARCHITECTURE}.deb")
     set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Neboer <rubinposter@gmail.com>")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "DNS to Hosts Synchronization Service")
@@ -102,8 +104,7 @@ if(WIN32)
         file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" NATIVE_INSTALL_DIR)
         message("=== installer files have been prepared ===")
         message("location: ${NATIVE_INSTALL_DIR}")
-        message("create NSIS installer using command bellow:")
-        message("makensis -DINSTDIR=${NATIVE_INSTALL_DIR} package/installer.nsi")
+        message("create NSIS installer using build_windows_installer.ps1:")
         message("=============================\n")
     ]])
 

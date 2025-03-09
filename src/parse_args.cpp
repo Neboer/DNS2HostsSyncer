@@ -31,21 +31,11 @@ namespace d2hs
             exit(1);
         }
 
-        if (parser.present("--hosts-file-path"))
-        {
-            return {
-                parser.get<std::string>("--config-file-location"),
-                parser.get<bool>("--dry-run"),
-                parser.get<std::string>("--hosts-file-path"),
-                true};
-        }
-        else
-        {
-            return {
-                parser.get<std::string>("--config-file-location"),
-                parser.get<bool>("--dry-run"),
-                "",
-                false};
-        }
+        return {
+            parser.get<std::string>("--config-file-location"),
+            parser.get<bool>("--dry-run"),
+            parser.get<std::string>("--hosts-file-path"),
+            true
+        };
     }
 }
