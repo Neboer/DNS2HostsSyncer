@@ -7,6 +7,11 @@
 ## Windows 构建打包
 
 1. 需要准备vcpkg和MSVC开发环境。如果需要打包，需要安装 nsis，并将 makensis 添加进PATH环境变量。
+    准备好vcpkg环境之后，执行
+    ```powershell
+    ./vcpkg install curl:x64-windows nlohmann-json:x64-windows spdlog:x64-windows argparse:x64-windows
+    ```
+    即可完成Windows中所有依赖的安装。
 2. 执行以下命令进行configure
     ```powershell
     cmake --preset windows-vcpkg -B build
