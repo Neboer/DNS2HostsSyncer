@@ -4,3 +4,4 @@ set -e
 # 停止并禁用服务
 systemctl stop DNS2HostsSyncer.timer
 systemctl disable DNS2HostsSyncer.timer
+systemctl daemon-reload

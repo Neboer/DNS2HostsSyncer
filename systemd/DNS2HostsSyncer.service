@@ -4,7 +4,7 @@ Description=synchronize DNS records from a PowerDNS upstream server to your host
 [Service]
 Type=oneshot
 User=root
-ExecStart=/usr/local/bin/d2hs 
+ExecStart=/usr/bin/d2hs 
 
 [Install]
 WantedBy=multi-user.target

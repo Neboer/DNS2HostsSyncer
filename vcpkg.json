@@ -1,6 +1,6 @@
 {
   "name": "d2hs",
-  "version": "2.3",
+  "version": "3.1",
   "dependencies": [
     "curl",
     "nlohmann-json",

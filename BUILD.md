@@ -23,13 +23,18 @@
     ```
     完成安装包生成，生成的安装包位于 `build/DNS2HostsSyncer_Installer.exe`
     双击安装包即可完成安装。
+    安装此包的时候会自动添加计划任务，默认不带参数执行d2hs，可以进入任务计划程序调整传递给 d2hs.exe 的参数。计划任务的名字叫作 D2HSAutoSync
 
 ## Debian 构建打包
 
 0. 安装依赖
     ```sh
+    apt install cmake build-essential file
     apt install libspdlog-dev nlohmann-json3-dev libcurl4-openssl-dev libargparse-dev
     ```
+    注意，一定要安装file，否则可能会导致打包失败。
+    在某些操作系统（如debian bookworm）中，可能不存在 libargparse-dev 这个包，这时就需要[手动构建](https://github.com/p-ranav/argparse#building-installing-and-testing)了。
+    不必担心，argparse是一个仅有头文件的C++库，只有在构建的时候才被需要，用户在运行时是不需要下载此依赖的。
 
 1. 使用 cmake 进行 configure
     ```sh
@@ -43,4 +48,5 @@
     ```sh
     make package -j $(nproc)
     ```
-    这样，文件会被构建在 build/d2hs_2.3_x86_64.deb 路径下。
+    这样，文件会被构建在 build/d2hs_xx_xx.deb 路径下。
+    注意，安装此debian包的时候会自动处理systemd服务以及配置文件的问题，不需要担心。

@@ -19,7 +19,7 @@
         in {
           default = pkgs.stdenv.mkDerivation {
             pname = "d2hs";
-            version = "2.3";
+            version = "3.1";
             src = ./.;
             nativeBuildInputs = (with pkgs; [ meson ninja cmake pkg-config ]);
             buildInputs = (commonDeps pkgs) ++ [ ];

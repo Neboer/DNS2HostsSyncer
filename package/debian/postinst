@@ -1,12 +1,9 @@
 #!/bin/sh
 set -e
 
-# 处理配置文件更新
 echo "config file location: /etc/d2hs/d2hs.json"
 
-# 重载systemd
 systemctl daemon-reload
 
-# 启用并启动服务
 systemctl enable DNS2HostsSyncer.timer
 systemctl start DNS2HostsSyncer.timer

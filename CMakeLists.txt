@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(d2hs LANGUAGES CXX VERSION 2.3)
+project(d2hs LANGUAGES CXX VERSION 3.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -54,7 +54,7 @@ if (UNIX)
         RUNTIME DESTINATION bin
     )
 
-    # 安装配置文件（总是覆盖打包版本）
+    # 安装配置文件到/etc/d2hs_config
     install(FILES config/example_d2hs.json
         DESTINATION /etc/d2hs
         RENAME d2hs.json
@@ -77,7 +77,7 @@ if (UNIX)
     set(CPACK_DEBIAN_PACKAGE_SECTION "net")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA 
-        "${CMAKE_CURRENT_SOURCE_DIR}/package/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/package/debian/prerm")
+        "${CMAKE_CURRENT_SOURCE_DIR}/package/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/package/debian/prerm;${CMAKE_CURRENT_SOURCE_DIR}/package/debian/conffiles")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
 
