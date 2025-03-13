@@ -1,4 +1,4 @@
-#include "record.h"
+#include "./a_aaaa_record.h"
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/fmt.h>

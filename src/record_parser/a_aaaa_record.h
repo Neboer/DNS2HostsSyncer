@@ -22,5 +22,4 @@ namespace d2hs
     };
 
     RecordType str_to_record_type(const str &record_type_str);
-
 }
