@@ -68,9 +68,7 @@ namespace d2hs
 
     std::vector<str> HostsFile::read_d2hs_lines()
     {
-        std::vector<str> extracted_content(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
-
-        return extracted_content;
+        return std::vector(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
     }
 
     str HostsFile::write_d2hs_lines(const std::vector<str> &new_content, bool dry_run)

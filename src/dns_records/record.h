@@ -8,7 +8,9 @@ namespace d2hs
     enum RecordType
     {
         A = 1,
-        AAAA = 2
+        AAAA = 2,
+        CNAME = 5,
+        OTHER = 0
     };
 
     struct RRRecord
@@ -16,9 +18,6 @@ namespace d2hs
         str name;
         str value;
         RecordType type;
-
-        str to_hosts_line() const;
-        // bool operator==(RRRecord const& another_record);
     };
 
     RecordType str_to_record_type(const str &record_type_str);
