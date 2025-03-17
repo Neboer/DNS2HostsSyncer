@@ -53,7 +53,7 @@ Section "Main Application" SecMain
   SetOutPath $INSTDIR
   
   ; Copy all files from CMake's package_install directory
-  File /r "..\..\build\package_install\*.*"
+  File /r "..\..\build\Release\*.*"
   File "reshedule_task.ps1"  ; add reshedule_task.ps1 to the installer
   File "..\..\config\example_d2hs.json" 
 
