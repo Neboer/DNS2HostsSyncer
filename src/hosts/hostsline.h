@@ -10,12 +10,12 @@ namespace d2hs
     {
     public:
         HostsLine(str hosts_line);
-        HostsLine(str name, str value, str comment);
+        HostsLine(str name, str value, str comment="");
         str name;
         str value;
         str comment;
 
         str dump() const;
-        bool operator==(const HostsLine &other) const;
+        bool operator<(const HostsLine& other);
     };
 }

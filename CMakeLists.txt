@@ -15,14 +15,15 @@ endif()
 
 # Source files for the project
 set(SOURCES
+    src/configs/parse_args.cpp
+    src/configs/parse_config.cpp
+    src/configs/rrpool_conf.cpp
+    src/dns_records/protocol.cpp
+    src/dns_records/record.cpp
+    src/dns_records/restapi.cpp
+    src/hosts/hostsline.cpp
+    src/hosts/hosts_file.cpp
     src/main.cpp
-    src/parse_args.cpp
-    src/protocol.cpp
-    src/record.cpp
-    src/restapi.cpp
-    src/hosts_file.cpp
-    src/parse_config.cpp
-    src/rrpool_conf.cpp
 )
 
 # Find required packages

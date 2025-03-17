@@ -1,0 +1,5 @@
+# Hosts File
+
+Hosts File中提供dim_dump_hosts和dim_write_hosts方法。这两个方法一个可以获取当前分隔符中的所有hosts信息，另一个可以将新hosts信息写入分隔符内。这两个方法都是针对分隔符处理的。HostsFile对外提供的接口只支持分隔符内的处理，不涉及分隔符外的部分。
+
+hosts文件本身是无序的，写入的时候遵循如下原则：尽量不落盘、落盘即有序，这两个不是HostsFile保证的，而是Converter需要保证的。HostsFile模块只需要做好一件事：输入输出。

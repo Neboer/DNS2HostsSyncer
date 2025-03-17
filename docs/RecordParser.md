@@ -20,3 +20,10 @@ A+AAAA -> 去重 -> CNAME
 
 
 下一个问题，D2HS如此操作，确实不会产生重复的解析记录吗？是否需要在CNAME之后再额外的经过一次合并？答案很简单：不会。
+
+## 实际Converter的行为
+
+Converter主要做如下的事情：
+1. 扫描所有输入的RRRecords，提取其中不重复域名的A和AAAA记录，整理进map A_AAAA_lookup_table中。
+2. 利用A_AAAA_lookup_table递归的解析所有CNAME域名到IP地址。
+3. 将map A_AAAA_lookup_table转换成HostsLine列表，和解析到IP地址的所有CNAME一起做HostsLine列表输出。

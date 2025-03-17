@@ -1,5 +1,5 @@
 #pragma once
-#include "rrpool_conf.h"
+#include "../configs/rrpool_conf.h"
 #include "record.h"
 
 using json = nlohmann::json;

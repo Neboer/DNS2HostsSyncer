@@ -6,7 +6,7 @@
 
 namespace d2hs
 {
-    HostsFile::HostsFile(str file_path) : delimiter_pos(), file_content()
+    HostsFile::HostsFile(str file_path) : head_content(""), body_lines(), tail_content("")
     {
         hosts_file_path = file_path;
         std::ifstream hosts_file(hosts_file_path);
@@ -21,68 +21,85 @@ namespace d2hs
             spdlog::info("Opened hosts file: {}", hosts_file_path);
         }
 
+        int current_pos = 0; // 0: head, 2: body, 4: tail
+        const int POS_HEAD = 0;
+        const int POS_BODY = 2;
+        const int POS_TAIL = 4;
         str line;
+        int delimiter_count = 0;
         while (std::getline(hosts_file, line))
         {
-            file_content.push_back(line);
+            bool is_delimiter = false;
+            if (line == HOSTS_DELIMITER)
+            {
+                is_delimiter = true;
+                delimiter_count++;
+            }
+
+            if (current_pos == POS_HEAD)
+            {
+                if (is_delimiter)
+                {
+                    current_pos = POS_BODY;
+                }
+                else
+                {
+                    head_content += line + '\n';
+                }
+            }
+            else if (current_pos == POS_BODY)
+            {
+                if (is_delimiter)
+                {
+                    current_pos = POS_TAIL;
+                }
+                else
+                {
+                    body_lines.push_back(HostsLine(line));
+                }
+            }
+            else if (current_pos == POS_TAIL)
+            {
+                if (hosts_file.eof())
+                {
+                    // 如果hosts文件的最后一行缺少换行符，我们也不要手动添加。
+                    tail_content += line;
+                }
+                else
+                {
+                    tail_content += line + '\n';
+                }
+            }
+            else
+            {
+                continue;
+            }
         }
         hosts_file.close();
 
-        // fist, find the first two delimiter positions.
-        for (std::size_t i = 0; i < file_content.size(); i++)
+        if (delimiter_count != 2)
         {
-            if (file_content[i] == HOSTS_DELIMITER)
-            {
-                delimiter_pos.push_back(i);
-                if (delimiter_pos.size() == 2)
-                {
-                    break;
-                }
-            }
-        }
-
-        if (delimiter_pos.size() == 1)
-        {
-            // only one delimiter found. This is an Malformed hosts file.
-            spdlog::critical("Malformed hosts file. Missing second delimiter.");
-            throw std::runtime_error("Malformed hosts file. Missing second delimiter.");
-        }
-        else if (delimiter_pos.size() == 0)
-        {
-            // no delimiter found. This file is untouched by d2hs.
-            spdlog::info("No delimiter found. This is a new file for d2hs.");
-
-            // add the delimiter to the last of the content.
-            delimiter_pos.push_back(file_content.size());
-            delimiter_pos.push_back(file_content.size() + 1);
-            file_content.push_back(HOSTS_DELIMITER);
-            file_content.push_back(HOSTS_DELIMITER);
-        }
-        else
-        {
-            // two delimiters found. This is a valid d2hs hosts file.
-            spdlog::info("Found two delimiters in hosts file.");
-            // extract the lines between the delimiters
+            spdlog::critical("Invalid hosts file: {}", hosts_file_path);
+            throw std::runtime_error("Invalid hosts file, delimiter count is not 2.");
         }
     }
 
-    std::vector<str> HostsFile::read_d2hs_lines()
+    std::vector<HostsLine> HostsFile::get_body_lines()
     {
-        return std::vector(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
+        return body_lines;
     }
 
-    str HostsFile::write_d2hs_lines(const std::vector<str> &new_content, bool dry_run)
+    void HostsFile::save_with_new_body(const std::vector<HostsLine> &new_body, const bool dry_run = false)
     {
-        // replace the content between the delimiters.
-        file_content.erase(file_content.begin() + delimiter_pos[0] + 1, file_content.begin() + delimiter_pos[1]);
-        file_content.insert(file_content.begin() + delimiter_pos[0] + 1, new_content.begin(), new_content.end());
-        delimiter_pos[1] = static_cast<int>(delimiter_pos[0] + new_content.size() + 1);
-
         std::stringstream output_buffer;
-        for (const auto &line : file_content)
+        output_buffer << head_content << HOSTS_DELIMITER << '\n';
+        for (const auto &line : new_body)
         {
-            output_buffer << line << '\n';
+            output_buffer << line.dump() << '\n';
         }
+        output_buffer << HOSTS_DELIMITER << '\n'
+                      << tail_content;
+
         if (!dry_run)
         {
             // update hosts file
@@ -95,10 +112,9 @@ namespace d2hs
             hosts_file << output_buffer.str();
             spdlog::info("Hosts file write completed.");
         }
-        return output_buffer.str();
     }
 
-    str HostsFile::get_hosts_file_path()
+    const str get_os_default_hosts_file_path()
     {
 #ifdef _WIN32
         return "C:\\Windows\\System32\\drivers\\etc\\hosts";

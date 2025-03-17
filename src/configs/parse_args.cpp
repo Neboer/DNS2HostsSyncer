@@ -1,6 +1,6 @@
 #include "parse_args.h"
 #include <spdlog/spdlog.h>
-#include "hosts_file.h"
+#include "../hosts/hosts_file.h"
 #include "parse_config.h"
 
 namespace d2hs
@@ -13,7 +13,7 @@ namespace d2hs
             .flag()
             .help("dry run");
         parser.add_argument("-f", "--hosts-file-path")
-            .default_value(HostsFile::get_hosts_file_path())
+            .default_value(get_os_default_hosts_file_path())
             .metavar("HOSTS_FILE_PATH")
             .help("Hosts file path, default is same as the config.");
         parser.add_argument("-c", "--config-file-location")

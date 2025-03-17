@@ -1,10 +1,10 @@
-#include "parse_args.h"
-#include "restapi.h"
-#include "protocol.h"
-#include "rrpool_conf.h"
-#include "record.h"
-#include "hosts_file.h"
-#include "parse_config.h"
+#include "configs/parse_args.h"
+#include "dns_records/restapi.h"
+#include "dns_records/protocol.h"
+#include "configs/rrpool_conf.h"
+#include "dns_records/record.h"
+#include "hosts/hosts_file.h"
+#include "configs/parse_config.h"
 #include <algorithm>
 #include <spdlog/spdlog.h>
 #include <curl/curl.h>
