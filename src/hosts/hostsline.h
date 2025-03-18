@@ -17,5 +17,6 @@ namespace d2hs
 
         str dump() const;
         bool operator<(const HostsLine& other);
+        bool operator==(const HostsLine& other);
     };
 }
