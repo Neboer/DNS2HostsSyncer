@@ -89,7 +89,7 @@ namespace d2hs
         return body_lines;
     }
 
-    void HostsFile::save_with_new_body(const std::vector<HostsLine> &new_body, const bool dry_run = false)
+    void HostsFile::save_with_new_body(const std::vector<HostsLine> &new_body, const bool dry_run)
     {
         std::stringstream output_buffer;
         output_buffer << head_content << HOSTS_DELIMITER << '\n';
@@ -106,7 +106,13 @@ namespace d2hs
             std::ofstream hosts_file(hosts_file_path);
             if (!hosts_file.is_open())
             {
+#ifdef _WIN32
+                char buf[512];
+                strerror_s(buf, sizeof(buf), errno);
+                spdlog::critical("Failed to write hosts file: {}, {}", hosts_file_path, buf);
+#else
                 spdlog::critical("Failed to write hosts file: {}, {}", hosts_file_path, strerror(errno));
+#endif
                 throw std::runtime_error("failed to write hosts file");
             }
             hosts_file << output_buffer.str();

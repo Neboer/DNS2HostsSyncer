@@ -16,7 +16,7 @@ namespace d2hs
         str comment;
 
         str dump() const;
-        bool operator<(const HostsLine& other);
-        bool operator==(const HostsLine& other);
+        bool HostsLine::operator<(const HostsLine& other) const;
+        bool HostsLine::operator==(const HostsLine& other) const;
     };
 }

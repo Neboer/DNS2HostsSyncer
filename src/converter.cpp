@@ -69,7 +69,7 @@ namespace d2hs
                 }
                 break;
             default:
-                spdlog::warn("unsupported record type: {}", record.type);
+                spdlog::warn("unsupported record type: {}", record_type_to_str(record.type));
                 break;
             }
         }

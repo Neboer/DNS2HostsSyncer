@@ -24,6 +24,7 @@ set(SOURCES
     src/hosts/hostsline.cpp
     src/hosts/hosts_file.cpp
     src/main.cpp
+    src/converter.cpp
 )
 
 # Find required packages

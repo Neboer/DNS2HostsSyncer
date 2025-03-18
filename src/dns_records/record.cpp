@@ -21,4 +21,19 @@ namespace d2hs
             return RecordType::OTHER;
         }
     }
+
+    str record_type_to_str(RecordType record_type)
+    {
+        switch (record_type)
+        {
+        case RecordType::A:
+            return "A";
+        case RecordType::AAAA:
+            return "AAAA";
+        case RecordType::CNAME:
+            return "CNAME";
+        default:
+            return "OTHER";
+        }
+    }
 }

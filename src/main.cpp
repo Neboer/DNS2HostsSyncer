@@ -1,15 +1,14 @@
-#include <algorithm>
-#include <curl/curl.h>
-#include <spdlog/spdlog.h>
 #include "configs/parse_args.h"
-#include "configs/parse_config.h"
-#include "configs/rrpool_conf.h"
-#include "converter.h"
-#include "dns_records/protocol.h"
-#include "dns_records/record.h"
 #include "dns_records/restapi.h"
+#include "dns_records/protocol.h"
+#include "configs/rrpool_conf.h"
+#include "dns_records/record.h"
 #include "hosts/hosts_file.h"
-#include "hosts/hostsline.h"
+#include "configs/parse_config.h"
+#include <algorithm>
+#include <spdlog/spdlog.h>
+#include <curl/curl.h>
+#include "converter.h"
 
 template <typename T>
 bool compare_two_unsorted_vectors(const std::vector<T> &v1, const std::vector<T> &v2)
@@ -18,8 +17,8 @@ bool compare_two_unsorted_vectors(const std::vector<T> &v1, const std::vector<T>
     {
         return false;
     }
-    std::vector<str> v1_copy = v1;
-    std::vector<str> v2_copy = v2;
+    std::vector<T> v1_copy = v1;
+    std::vector<T> v2_copy = v2;
     std::sort(v1_copy.begin(), v1_copy.end());
     std::sort(v2_copy.begin(), v2_copy.end());
     return v1_copy == v2_copy;
