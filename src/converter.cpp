@@ -32,7 +32,7 @@ namespace d2hs
         else
         {
             // 未发现记录，不能解析。
-            std::nullopt;
+            return std::nullopt;
         }
     }
 
