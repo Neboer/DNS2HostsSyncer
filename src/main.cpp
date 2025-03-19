@@ -26,7 +26,7 @@ int main(int argc, char **argv)
                 auto file_logger = spdlog::basic_logger_mt("file_logger", program_args.log_file_location);
                 spdlog::set_default_logger(file_logger);
             } catch (const spdlog::spdlog_ex& e) {
-                spdlog::error("Failed to create file logger: {}", e.what());
+                spdlog::error("Failed to open file for logging: {}", e.what());
                 return 1;
             }
         }
