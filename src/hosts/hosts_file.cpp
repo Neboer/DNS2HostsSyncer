@@ -117,6 +117,8 @@ namespace d2hs
             }
             hosts_file << output_buffer.str();
             spdlog::info("Hosts file write completed.");
+        } else {
+            spdlog::info("Dry run, hosts file not updated.");
         }
     }
 

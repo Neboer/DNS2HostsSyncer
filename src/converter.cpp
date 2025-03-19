@@ -3,7 +3,6 @@
 #include <optional>
 #include <spdlog/spdlog.h>
 
-
 namespace d2hs
 {
     HostsLine convert_A_AAAA_record_to_hosts_line(const RRRecord &record)
@@ -64,7 +63,9 @@ namespace d2hs
                 {
                     spdlog::warn("CNAME record {} found in A or AAAA records, deleting A or AAAA record", record.name);
                     records_dict.address_lookup_table.erase(record.name);
-                } else {
+                }
+                else
+                {
                     insert_into_map_or_delete_key_if_exists(records_dict.cname_lookup_table, record.name, record.value);
                 }
                 break;
@@ -87,7 +88,9 @@ namespace d2hs
             {
                 spdlog::info("resolved CNAME record: {} to {}", cname_record.first, *resolved_addr);
                 result_hosts_lines.push_back(HostsLine(cname_record.first, *resolved_addr));
-            } else {
+            }
+            else
+            {
                 spdlog::warn("failed to resolve CNAME record: {}, skip it.", cname_record.first);
             }
         }

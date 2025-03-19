@@ -76,7 +76,6 @@ int main(int argc, char **argv)
                 spdlog::error("Failed to update hosts file. Error: {}", e.what());
                 return 1;
             }
-            spdlog::info("Hosts file updated.");
         }
         else
         {

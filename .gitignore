@@ -35,5 +35,6 @@ builddir/
 .vscode/
 build/
 result
+out
 
 windows_build.ps1
