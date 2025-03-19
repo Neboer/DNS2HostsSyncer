@@ -9,20 +9,7 @@
 #include <spdlog/spdlog.h>
 #include <curl/curl.h>
 #include "converter.h"
-
-template <typename T>
-bool compare_two_unsorted_vectors(const std::vector<T> &v1, const std::vector<T> &v2)
-{
-    if (v1.size() != v2.size())
-    {
-        return false;
-    }
-    std::vector<T> v1_copy = v1;
-    std::vector<T> v2_copy = v2;
-    std::sort(v1_copy.begin(), v1_copy.end());
-    std::sort(v2_copy.begin(), v2_copy.end());
-    return v1_copy == v2_copy;
-}
+#include "diff.hpp"
 
 int main(int argc, char **argv)
 {
@@ -63,11 +50,22 @@ int main(int argc, char **argv)
         std::vector<d2hs::HostsLine> new_hosts_lines = d2hs::convert_records_to_hosts_lines(all_records);
         std::vector<d2hs::HostsLine> current_hosts_lines = hosts_file.get_body_lines();
 
-        // 检查两组hosts行是否完全相同
-        auto is_records_changed = !compare_two_unsorted_vectors<d2hs::HostsLine>(new_hosts_lines, current_hosts_lines);
+        // 比对新旧hosts行，如果不同则更新hosts文件。
+        diff_result<d2hs::HostsLine> diff_result = diff_lists(current_hosts_lines, new_hosts_lines);
 
-        if (is_records_changed)
+        if (diff_result.only_in_first.size() > 0 || diff_result.only_in_second.size() > 0)
         {
+            // 先打印出差异
+            spdlog::info("Changes detected in DNS result:");
+            for (const auto &line : diff_result.only_in_second)
+            {
+                spdlog::info("\033[32m+ {}\033[0m", line.hostname);
+            }
+            for (const auto &line : diff_result.only_in_first)
+            {
+                spdlog::info("\033[31m- {}\033[0m", line.hostname);
+            }
+
             // hosts文件内容与服务器响应之间存在差异，更新hosts文件。
             spdlog::info("Detected changes in DNS result.");
             try {
