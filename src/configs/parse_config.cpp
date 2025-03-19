@@ -43,7 +43,7 @@ namespace d2hs
     {
 #if defined(_WIN32)
         // Windows default config file location using %APPDATA%
-        if (const char* appdata = std::getenv("APPDATA"))
+        if (const char* appdata = "C:\\ProgramData")
         {
             return std::string(appdata) + "\\neboer\\DNS2HostsSyncer\\d2hs.json";
         }

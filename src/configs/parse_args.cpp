@@ -20,6 +20,10 @@ namespace d2hs
             .default_value(get_default_config_file_location())
             .metavar("CONFIG_FILE_LOCATION")
             .help("Configuration file location");
+        parser.add_argument("-l", "--log-file-location")
+            .default_value("")
+            .metavar("LOG_FILE_LOCATION")
+            .help("log to specified file as well as stdout");
         try
         {
             parser.parse_args(argc, argv);
@@ -33,6 +37,9 @@ namespace d2hs
 
         return {
             parser.get<std::string>("--config-file-location"),
+            parser.is_used("--log-file-location"),
+            parser.get("--log-file-location"),
+
             parser.get<bool>("--dry-run"),
             parser.get<std::string>("--hosts-file-path"),
             true

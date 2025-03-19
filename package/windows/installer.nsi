@@ -13,6 +13,8 @@ VIAddVersionKey "FileVersion" "1.0.0"
 VIAddVersionKey "LegalCopyright" "© 2025 Until Software"
 VIAddVersionKey "FileDescription" "DNS2HostsSyncer Installer"
 
+!define PROGRAM_CONFIG_DIR "C:\ProgramData\neboer\DNS2HostsSyncer"
+!define PROGRAM_LOG_DIR "C:\ProgramData\neboer\DNS2HostsSyncer"
 ; -------------------------------
 ; Modern UI Configuration
 ; -------------------------------
@@ -57,14 +59,12 @@ Section "Main Application" SecMain
   File "reshedule_task.ps1"  ; add reshedule_task.ps1 to the installer
   File "..\..\config\example_d2hs.json" 
 
-  ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" "AppData"
   DetailPrint "Detected user AppData: $0"
   ; Create AppData directory
-  CreateDirectory "$0\neboer\DNS2HostsSyncer"
-  DetailPrint "Creating directory: $0\neboer\DNS2HostsSyncer (if it already exists, no error will be thrown)"
+  CreateDirectory "${PROGRAM_CONFIG_DIR}"
+  DetailPrint "Creating directory: ${PROGRAM_CONFIG_DIR} (skip if exists)"
 
-  SetOutPath "$0\neboer\DNS2HostsSyncer"
-  DetailPrint "Current output directory set to: $OUTDIR"
+  SetOutPath "${PROGRAM_CONFIG_DIR}"
 
   DetailPrint "Checking if file exists: [$OUTDIR\d2hs.json]"
   IfFileExists "d2hs.json" skip_config_copy 0
@@ -98,7 +98,7 @@ Section "Main Application" SecMain
   DetailPrint "now creating shedule task..."
   nsExec::ExecToLog 'powershell.exe -ExecutionPolicy Bypass -Command "& { \
     $env:PSModulePath = [System.Environment]::GetEnvironmentVariable(\"PSModulePath\", \"Machine\"); \
-    & \"$INSTDIR\reshedule_task.ps1\" -BinaryPath \"$INSTDIR\d2hs.exe\" \
+    & \"$INSTDIR\reshedule_task.ps1\" -BinaryPath \"$INSTDIR\d2hs.exe\" -LogFilePath \"${PROGRAM_LOG_DIR}\D2HSAutoSync.log\" \
   }"'
   Pop $0  ; get the return value
   ${If} $0 != 0

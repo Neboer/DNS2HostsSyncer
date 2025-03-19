@@ -10,8 +10,10 @@ namespace d2hs
     struct program_arguments
     {
         str config_file_location;
+        bool is_log_file_location_set;
+        str log_file_location;
+        
         bool dry_run;
-
         str hosts_file_path;
         bool is_hosts_file_set;
     };

@@ -10,12 +10,28 @@
 #include <curl/curl.h>
 #include "converter.h"
 #include "diff.hpp"
+#include <spdlog/sinks/basic_file_sink.h>
 
 int main(int argc, char **argv)
 {
     try
     {
         d2hs::program_arguments program_args = d2hs::parse_args(argc, argv);
+        if (program_args.is_log_file_location_set)
+        {
+            // spdlog::set_level(spdlog::level::info);
+            // spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+            spdlog::info("Logging to file: {}", program_args.log_file_location);
+            try {
+                auto file_logger = spdlog::basic_logger_mt("file_logger", program_args.log_file_location);
+                spdlog::set_default_logger(file_logger);
+            } catch (const spdlog::spdlog_ex& e) {
+                spdlog::error("Failed to create file logger: {}", e.what());
+                return 1;
+            }
+        }
+        
+        spdlog::info("use config file: {}", program_args.config_file_location);
         d2hs::program_config program_cfg = d2hs::parse_config_file(program_args.config_file_location);
         curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -23,7 +39,6 @@ int main(int argc, char **argv)
                                                                     : d2hs::HostsFile(program_cfg.hosts_file_path);
 
         std::vector<d2hs::RRRecord> all_records = {};
-        bool error_on_api = false;
 
         // gather api results.
         for (const auto &rrpool_cfg : program_cfg.rrpool_cfgs)
@@ -38,11 +53,9 @@ int main(int argc, char **argv)
             }
             catch (const std::runtime_error &e)
             {
-                error_on_api = true;
-                spdlog::error("Failed to process PowerDNS API from endpoint: {}, server_name: {}, zone_name: {}. Error: {}. Skipping this API request.",
+                spdlog::critical("Failed to process PowerDNS API from endpoint: {}, server_name: {}, zone_name: {}. Error: {}. Exiting.",
                               rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name, e.what());
-                spdlog::warn("Due to error in API request, the hosts file will not be updated, dry run will be performed.");
-                continue;
+                exit(2);
             }
         }
 
@@ -57,19 +70,30 @@ int main(int argc, char **argv)
         {
             // 先打印出差异
             spdlog::info("Changes detected in DNS result:");
-            for (const auto &line : diff_result.only_in_second)
-            {
-                spdlog::info("\033[32m+ {}\033[0m", line.hostname);
-            }
-            for (const auto &line : diff_result.only_in_first)
-            {
-                spdlog::info("\033[31m- {}\033[0m", line.hostname);
+            if (program_args.is_log_file_location_set) {
+                for (const auto &line : diff_result.only_in_second)
+                {
+                    spdlog::info("+ {}", line.hostname);
+                }
+                for (const auto &line : diff_result.only_in_first)
+                {
+                    spdlog::info("- {}", line.hostname);
+                }
+            } else {
+                for (const auto &line : diff_result.only_in_second)
+                {
+                    spdlog::info("\033[32m+ {}\033[0m", line.hostname);
+                }
+                for (const auto &line : diff_result.only_in_first)
+                {
+                    spdlog::info("\033[31m- {}\033[0m", line.hostname);
+                }
             }
 
             // hosts文件内容与服务器响应之间存在差异，更新hosts文件。
             spdlog::info("Detected changes in DNS result.");
             try {
-                hosts_file.save_with_new_body(new_hosts_lines, program_args.dry_run || error_on_api);
+                hosts_file.save_with_new_body(new_hosts_lines, program_args.dry_run);
             } catch (const std::runtime_error &e) {
                 spdlog::error("Failed to update hosts file. Error: {}", e.what());
                 return 1;

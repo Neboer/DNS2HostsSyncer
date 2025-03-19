@@ -28,7 +28,7 @@ ArchLinux可以安装[dns2hostssyncer-git](https://aur.archlinux.org/pkgbase/dns
 |-------------|--------------------------------------------|
 | Linux       | `/etc/d2hs/d2hs.json`                      |
 | macOS       | `/etc/d2hs/d2hs.json`                      |
-| Windows     | `%APPDATA%\neboer\DNS2HostsSyncer`         |
+| Windows     | `C:\ProgramData\neboer\DNS2HostsSyncer`         |
 
 配置文件采用JSON格式，包含以下配置项：
 
@@ -86,7 +86,10 @@ ArchLinux可以安装[dns2hostssyncer-git](https://aur.archlinux.org/pkgbase/dns
   -d, --dry-run               试运行模式
   -f, --hosts-file-path       指定hosts文件路径 [默认系统hosts]
   -c, --config-file-location  指定配置文件路径 [参考配置说明]
+  -l, --log-file-location     指定日志文件路径
 ```
+
+在Windows上安装后，自动添加的计划任务会将软件产生的日志文件写入`C:\ProgramData\neboer\DNS2HostsSyncer\D2HSAutoSync.log`中。
 
 ## hosts文件路径
 如果不传入hosts文件路径，则在不同的操作系统中，d2hs会在不同的路径下寻找默认的hosts文件。

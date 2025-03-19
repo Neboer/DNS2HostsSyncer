@@ -2,7 +2,10 @@
 
 param(
     [Parameter(Mandatory = $true)]
-    [string]$BinaryPath  # Accepts the full path to the binary file
+    [string]$BinaryPath,  # Accepts the full path to the binary file
+
+    [Parameter(Mandatory = $true)]
+    [string]$LogFilePath # Accepts the full path to the log file
 )
 
 # https://stackoverflow.com/a/58723508
@@ -101,9 +104,10 @@ $taskName = "D2HSAutoSync"
 
 # Check if the task already exists
 if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue) {
-    Show-MessageBox -Message "Task $taskName already exists, no need to create" -Title "Task already exists" -Icon Information -Buttons OK
+    Show-MessageBox -Message "Task $taskName already exists, delete and recreate." -Title "Task already exists" -Icon Information -Buttons OK
     Write-Host "Task $taskName already exists, no need to create" -ForegroundColor Green
-    exit 0
+    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+    Write-Host "Deleted existing task $taskName" -ForegroundColor Yellow
 }
 
 # Create trigger (key modification point)
@@ -115,7 +119,7 @@ $triggerParams = @{
 $trigger = New-ScheduledTaskTrigger @triggerParams
 
 # Create task action
-$action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory $workingDir
+$action = New-ScheduledTaskAction -Execute $exePath -WorkingDirectory $workingDir -Argument "--log-file-location `"$LogFilePath`""
 
 # Configure task settings
 $settings = New-ScheduledTaskSettingsSet `
