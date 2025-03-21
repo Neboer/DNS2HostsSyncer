@@ -47,7 +47,7 @@ target_link_libraries(d2hs
 
 # 设置默认安装前缀为相对路径（仅在用户未指定时生效）
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND UNIX)
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Installation directory" FORCE)
+    set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Installation directory" FORCE)
 endif()
 
 if (UNIX)
