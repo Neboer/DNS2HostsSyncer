@@ -11,6 +11,7 @@
 #include "converter.h"
 #include "diff.hpp"
 #include <spdlog/sinks/basic_file_sink.h>
+#include "exit_code.hpp"
 
 int main(int argc, char **argv)
 {
@@ -22,15 +23,18 @@ int main(int argc, char **argv)
             // spdlog::set_level(spdlog::level::info);
             // spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
             spdlog::info("Logging to file: {}", program_args.log_file_location);
-            try {
+            try
+            {
                 auto file_logger = spdlog::basic_logger_mt("file_logger", program_args.log_file_location);
                 spdlog::set_default_logger(file_logger);
-            } catch (const spdlog::spdlog_ex& e) {
+            }
+            catch (const spdlog::spdlog_ex &e)
+            {
                 spdlog::error("Failed to open file for logging: {}", e.what());
-                return 1;
+                return d2hs::ExitCode::LOG_INIT_FAILURE;
             }
         }
-        
+
         spdlog::info("use config file: {}", program_args.config_file_location);
         d2hs::program_config program_cfg = d2hs::parse_config_file(program_args.config_file_location);
         curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -54,8 +58,9 @@ int main(int argc, char **argv)
             catch (const std::runtime_error &e)
             {
                 spdlog::critical("Failed to process PowerDNS API from endpoint: {}, server_name: {}, zone_name: {}. Error: {}. Exiting.",
-                              rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name, e.what());
-                exit(2);
+                                 rrpool_cfg.api_endpoint_url, rrpool_cfg.server_name, rrpool_cfg.zone_name, e.what());
+                curl_global_cleanup();
+                return d2hs::ExitCode::API_FAILURE;
             }
         }
 
@@ -70,7 +75,8 @@ int main(int argc, char **argv)
         {
             // 先打印出差异
             spdlog::info("Changes detected in DNS result:");
-            if (program_args.is_log_file_location_set) {
+            if (program_args.is_log_file_location_set)
+            {
                 for (const auto &line : diff_result.only_in_second)
                 {
                     spdlog::info("+ {}", line.hostname);
@@ -79,7 +85,9 @@ int main(int argc, char **argv)
                 {
                     spdlog::info("- {}", line.hostname);
                 }
-            } else {
+            }
+            else
+            {
                 for (const auto &line : diff_result.only_in_second)
                 {
                     spdlog::info("\033[32m+ {}\033[0m", line.hostname);
@@ -92,23 +100,28 @@ int main(int argc, char **argv)
 
             // hosts文件内容与服务器响应之间存在差异，更新hosts文件。
             spdlog::info("Detected changes in DNS result.");
-            try {
+            try
+            {
                 hosts_file.save_with_new_body(new_hosts_lines, program_args.dry_run);
-            } catch (const std::runtime_error &e) {
+            }
+            catch (const std::runtime_error &e)
+            {
                 spdlog::error("Failed to update hosts file. Error: {}", e.what());
-                return 1;
+                return d2hs::ExitCode::HOSTS_UPDATE_FAILURE;
             }
         }
         else
         {
             spdlog::info("No changes detected in DNS result, hosts file is up to date.");
         }
-
-        return 0;
+        
+        curl_global_cleanup();
+        return d2hs::ExitCode::SUCCESS;
     }
     catch (const std::exception &e)
     {
         spdlog::critical("An error occurred: {}", e.what());
-        return 1;
+        curl_global_cleanup();
+        return d2hs::ExitCode::OTHER_FAILURE;
     }
 }
