@@ -78,12 +78,13 @@ namespace d2hs
         std::vector<HostsLine> result_hosts_lines;
         // 先添加 A 和 AAAA 记录，再添加 CNAME 记录。
         for (auto addr_record : records_dict.address_lookup_table)
+        // addr_record: ("test-cname.local.", "target-addr.local.")
         {
             result_hosts_lines.push_back(HostsLine(addr_record.first, addr_record.second));
         }
         for (auto cname_record : records_dict.cname_lookup_table)
         {
-            auto resolved_addr = resolve_cname_hostname(cname_record.first, records_dict);
+            auto resolved_addr = resolve_cname_hostname(cname_record.second, records_dict);
             if (resolved_addr)
             {
                 spdlog::info("resolved CNAME record: {} to {}", cname_record.first, *resolved_addr);
