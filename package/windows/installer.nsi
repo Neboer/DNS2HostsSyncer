@@ -7,7 +7,7 @@ Name "DNS2HostsSyncer"
 !system 'mkdir "../../build"'
 OutFile "../../build/DNS2HostsSyncer_Installer.exe"
 Caption "DNS2HostsSyncer Installation"
-VIProductVersion "4.0.0.0"
+VIProductVersion "4.1.0.0"
 VIAddVersionKey "ProductName" "DNS2HostsSyncer"
 VIAddVersionKey "FileVersion" "1.0.0"
 VIAddVersionKey "LegalCopyright" "© 2025 Until Software"
@@ -126,7 +126,7 @@ SectionEnd
 ; Version Info Resource (Optional)
 ; -------------------------------
 !ifdef INCLUDE_VERSION_INFO
-VIAddVersionKey "ProductVersion" "4.0.0"
+VIAddVersionKey "ProductVersion" "4.1.0"
 VIAddVersionKey "OriginalFilename" "DNS2HostsSyncer_Installer.exe"
 !endif
 
