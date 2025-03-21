@@ -19,8 +19,8 @@ namespace d2hs
         // str comment; // 我们目前不支持注释
 
         str dump() const;
-        bool HostsLine::operator<(const HostsLine& other) const;
-        bool HostsLine::operator==(const HostsLine& other) const;
+        bool operator<(const HostsLine& other) const;
+        bool operator==(const HostsLine& other) const;
     private:
         std::vector<str> split_str_white_space(const str &s);
     };

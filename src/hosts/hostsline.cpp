@@ -1,5 +1,6 @@
 #include "hostsline.h"
 #include <sstream> // For string stream operations
+#include <iterator>
 
 namespace d2hs
 {
