@@ -7,7 +7,7 @@ namespace d2hs
 {
     program_arguments parse_args(int argc, char **argv)
     {
-        argparse::ArgumentParser parser("d2hs", "3.1");
+        argparse::ArgumentParser parser("d2hs", "4.0");
 
         parser.add_argument("-d", "--dry-run")
             .flag()
