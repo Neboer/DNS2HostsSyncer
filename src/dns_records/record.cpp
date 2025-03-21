@@ -1,22 +1,15 @@
 #include "./record.h"
+#include <stdexcept>
 
 namespace d2hs
 {
     RecordType str_to_record_type(const str &record_type_str)
     {
-        if (record_type_str == "A")
+        try
         {
-            return RecordType::A;
+            return str_to_record_type_map.at(record_type_str);
         }
-        else if (record_type_str == "AAAA")
-        {
-            return RecordType::AAAA;
-        }
-        else if (record_type_str == "CNAME")
-        {
-            return RecordType::CNAME;
-        }
-        else
+        catch (const std::out_of_range&)
         {
             return RecordType::OTHER;
         }
@@ -24,15 +17,12 @@ namespace d2hs
 
     str record_type_to_str(RecordType record_type)
     {
-        switch (record_type)
+        try
         {
-        case RecordType::A:
-            return "A";
-        case RecordType::AAAA:
-            return "AAAA";
-        case RecordType::CNAME:
-            return "CNAME";
-        default:
+            return record_type_to_str_map.at(record_type);
+        }
+        catch (const std::out_of_range&)
+        {
             return "OTHER";
         }
     }

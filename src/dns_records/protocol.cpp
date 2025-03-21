@@ -39,7 +39,7 @@ namespace d2hs
                         rt    
                     });
             }
-            catch (const std::invalid_argument &e)
+            catch (const std::invalid_argument&)
             {
                 // skip this record.
                 spdlog::warn("Skipping record: {}", rr_record["name"].dump());
