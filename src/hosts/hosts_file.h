@@ -26,6 +26,7 @@ namespace d2hs
         str head_content;
         std::vector<HostsLine> body_lines;
         str tail_content;
+        static void add_delimiter_to_hostfile(const str &hosts_file_path);
     };
 
     const str get_os_default_hosts_file_path();

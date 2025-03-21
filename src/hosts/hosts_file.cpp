@@ -29,6 +29,11 @@ namespace d2hs
         int delimiter_count = 0;
         while (std::getline(hosts_file, line))
         {
+            if (line.empty())
+            {
+                continue;
+            }
+            
             bool is_delimiter = false;
             if (line == HOSTS_DELIMITER)
             {
@@ -77,7 +82,12 @@ namespace d2hs
         }
         hosts_file.close();
 
-        if (delimiter_count != 2)
+        if (delimiter_count == 0)
+        {
+            spdlog::warn("No delimiter found in hosts file. Will inserting.");
+            add_delimiter_to_hostfile(hosts_file_path);
+            spdlog::info("Delimiters inserted.");
+        } else if (delimiter_count != 2)
         {
             spdlog::critical("Invalid hosts file: {}", hosts_file_path);
             throw std::runtime_error("Invalid hosts file, delimiter count is not 2.");
@@ -120,6 +130,17 @@ namespace d2hs
         } else {
             spdlog::info("Dry run, hosts file not updated.");
         }
+    }
+
+    void HostsFile::add_delimiter_to_hostfile(const str &hosts_file_path) {
+        std::ofstream hosts_file(hosts_file_path, std::ios::app);
+        if (!hosts_file.is_open())
+        {
+            spdlog::critical("Failed to open hosts file: {}", hosts_file_path);
+            throw std::runtime_error("Failed to open hosts file.");
+        }
+        hosts_file << '\n' << HOSTS_DELIMITER << '\n' << HOSTS_DELIMITER << '\n';
+        hosts_file.close();
     }
 
     const str get_os_default_hosts_file_path()
