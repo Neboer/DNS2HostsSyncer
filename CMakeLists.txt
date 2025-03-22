@@ -51,24 +51,23 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND UNIX)
 endif()
 
 if (UNIX)
+    include(GNUInstallDirs)
+    
     # Installation rules for executable
     install(TARGETS d2hs
         RUNTIME DESTINATION bin
     )
 
-    # 安装配置文件到 /etc/d2hs，但如果目标文件已存在，则不覆盖
-    install(CODE [[
-        file(MAKE_DIRECTORY "/etc/d2hs")
-        if(NOT EXISTS "/etc/d2hs/d2hs.json")
-            file(INSTALL DESTINATION "/etc/d2hs" TYPE FILE FILES "${CMAKE_CURRENT_SOURCE_DIR}/config/example_d2hs.json" RENAME "d2hs.json")
-        else()
-            message(STATUS "Configuration file /etc/d2hs/d2hs.json already exists. Skipping installation.")
-        endif()
-    ]])
+    # 安装示例配置文件到共享目录
+    message(STATUS "CMAKE_INSTALL_SYSCONFDIR: ${CMAKE_INSTALL_FULL_SYSCONFDIR}/d2hs")
+    install(FILES config/example_d2hs.json
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/d2hs
+        RENAME d2hs.json
+    )
     
     # Install systemd service and timer files
     install(FILES systemd/DNS2HostsSyncer.service systemd/DNS2HostsSyncer.timer
-        DESTINATION /usr/lib/systemd/system
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/systemd/system
     )
     # 检测目标架构
     EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
