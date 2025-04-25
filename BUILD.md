@@ -32,7 +32,7 @@
 
 ## Debian 构建打包
 
-0. 安装依赖
+0. 安装依赖（Ubuntu系统）
     ```sh
     apt install cmake build-essential file
     apt install libspdlog-dev nlohmann-json3-dev libcurl4-openssl-dev libargparse-dev
@@ -53,5 +53,5 @@
     ```sh
     make package -j $(nproc)
     ```
-    这样，文件会被构建在 build/d2hs_xx_xx.deb 路径下。
+    这样，文件会被构建在 build/d2hs_xxx.deb 路径下。
     注意，安装此debian包的时候会自动处理systemd服务以及配置文件的问题，不需要担心。
