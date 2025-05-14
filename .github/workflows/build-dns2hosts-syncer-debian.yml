@@ -1,0 +1,55 @@
+name: Build Debian Package 2
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-debian:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      options: --cap-add=SYS_PTRACE
+
+    steps:
+      - name: Set up environment
+        run: |
+          apt update && \
+          apt install -y curl git cmake build-essential file libspdlog-dev nlohmann-json3-dev libcurl4-openssl-dev && \
+          apt clean && \
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Build argparse
+        run: |
+          cd /root
+          git clone https://github.com/p-ranav/argparse
+          cd argparse
+          mkdir build
+          cd build
+          cmake -DARGPARSE_BUILD_SAMPLES=off -DARGPARSE_BUILD_TESTS=off ..
+          make
+          make install
+
+      - name: Clone and build DNS2HostsSyncer
+        run: |
+          cd /root
+          git clone https://github.com/Neboer/DNS2HostsSyncer.git
+          cd DNS2HostsSyncer
+          cmake --preset linux-native -B build
+          cd build
+          make package -j $(nproc)
+
+      - name: Upload .deb as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dns2hosts-syncer
+          path: /root/DNS2HostsSyncer/build/*.deb
+
+      - name: Print build info
+        run: |
+          echo "Build completed."
+          ls -l /root/DNS2HostsSyncer/build/
