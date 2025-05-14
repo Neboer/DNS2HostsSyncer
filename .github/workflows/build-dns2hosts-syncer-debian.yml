@@ -44,7 +44,7 @@ jobs:
           make package -j $(nproc)
 
       - name: Upload .deb as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dns2hosts-syncer
           path: /root/DNS2HostsSyncer/build/*.deb
