@@ -21,23 +21,9 @@
             pname = "d2hs";
             version = "4.1";
             src = ./.;
-            nativeBuildInputs = (with pkgs; [ meson ninja cmake pkg-config ]);
+            nativeBuildInputs = (with pkgs; [ cmake pkg-config ]);
             buildInputs = (commonDeps pkgs) ++ [ ];
             enableParallelBuilding = true;
-            preConfigure = ''
-              #mkdir $out
-            '';
-            configurePhase = ''
-              meson setup build
-            '';
-            buildPhase = ''
-              meson compile -C build
-            '';
-            installPhase = ''
-              DESTDIR=$out meson install -C build
-              mv $out/usr/local/bin $out/bin
-              rm -r $out/usr
-            '';
           };
         });
 
